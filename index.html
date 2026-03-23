@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Denver Concerts 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f0f14;
+      color: #e8e8f0;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid #2a2a4a;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 6px;
+    }
+    .header-icon { font-size: 2.2rem; }
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e040fb, #7c4dff, #40c4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 0.9rem;
+      margin-left: 56px;
+    }
+
+    /* FILTERS */
+    .filters-bar {
+      background: #16161f;
+      border-bottom: 1px solid #2a2a4a;
+      padding: 14px 32px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      font-weight: 600;
+    }
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-chip {
+      background: #1e1e2e;
+      color: #888;
+      border: 1px solid #3a3a5a;
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: #7c4dff; color: #ccc; }
+    .filter-chip.active { background: #7c4dff; color: #fff; border-color: #7c4dff; }
+    .filter-chip.select-all { font-weight: 700; font-style: italic; }
+    .result-count {
+      margin-left: auto;
+      font-size: 0.82rem;
+      color: #888;
+      background: #1e1e2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 20px;
+      padding: 5px 14px;
+    }
+    .result-count span { color: #e040fb; font-weight: 700; }
+
+    /* SEARCH */
+    .search-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+    .search-input {
+      width: 100%;
+      background: #1e1e2e;
+      color: #e8e8f0;
+      border: 1px solid #3a3a5a;
+      border-radius: 20px;
+      padding: 9px 16px 9px 36px;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input::placeholder { color: #666; }
+    .search-input:focus { border-color: #7c4dff; }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+    .search-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #1e1e2e;
+      border: 1px solid #3a3a5a;
+      border-radius: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .search-dropdown.open { display: block; }
+    .search-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #ccc;
+      transition: background 0.1s;
+    }
+    .search-item:hover, .search-item.highlighted {
+      background: #2a2a4a;
+      color: #fff;
+    }
+    .search-item:first-child { border-radius: 12px 12px 0 0; }
+    .search-item:last-child { border-radius: 0 0 12px 12px; }
+    .search-item .search-date {
+      font-size: 0.72rem;
+      color: #777;
+      margin-left: 8px;
+    }
+
+    /* MONTH NAV */
+    .month-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 18px 32px 6px;
+    }
+    .nav-btn {
+      background: #1e1e2e;
+      border: 1px solid #3a3a5a;
+      color: #e8e8f0;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-btn:hover { background: #7c4dff; border-color: #7c4dff; }
+    .month-label {
+      font-size: 1.35rem;
+      font-weight: 700;
+      min-width: 220px;
+      text-align: center;
+    }
+    .month-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      padding: 8px 32px 16px;
+    }
+    .month-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #2a2a4a;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .month-dot:hover { background: #7c4dff; }
+    .month-dot.active { background: #7c4dff; transform: scale(1.4); }
+    .month-dot.has-events { background: #3a3a6a; }
+
+    /* CALENDAR GRID */
+    .calendar-wrap {
+      padding: 0 24px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .cal-header-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .cal-header-day {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #555;
+      padding: 8px 0;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-auto-rows: 185px;
+      gap: 4px;
+    }
+    .cal-cell {
+      background: #16161f;
+      border: 1px solid #1e1e2e;
+      border-radius: 10px;
+      padding: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .cal-cell.has-events { cursor: pointer; }
+    .cal-cell.has-events:hover { border-color: #7c4dff; background: #1a1a2a; }
+    .cal-cell.empty { background: transparent; border-color: transparent; }
+    .cal-cell.today { border-color: #e040fb; }
+    .cal-cell.today .day-num { color: #e040fb; font-weight: 700; }
+    .day-num {
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .event-chip {
+      font-size: 0.68rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .more-events {
+      font-size: 0.65rem;
+      color: #777;
+      margin-top: auto;
+      font-style: italic;
+    }
+
+    /* Genre chip colors */
+    .genre-hiphop      { background: #3d1a5c; color: #d080ff; border-left: 3px solid #9c27b0; }
+    .genre-electronic  { background: #0d2b4a; color: #40c4ff; border-left: 3px solid #0288d1; }
+    .genre-rock        { background: #3d1a1a; color: #ff7043; border-left: 3px solid #e64a19; }
+    .genre-country     { background: #2e2500; color: #ffd54f; border-left: 3px solid #f9a825; }
+    .genre-pop         { background: #1a0d2e; color: #f48fb1; border-left: 3px solid #e91e63; }
+    .genre-indie       { background: #0d2e1a; color: #69f0ae; border-left: 3px solid #00897b; }
+    .genre-punk        { background: #2e0d0d; color: #ff8a80; border-left: 3px solid #c62828; }
+    .genre-jam         { background: #1a2e20; color: #a5d6a7; border-left: 3px solid #388e3c; }
+    .genre-metal       { background: #1e1e1e; color: #bdbdbd; border-left: 3px solid #424242; }
+
+    /* LEGEND */
+    .legend-wrap {
+      padding: 4px 24px 8px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; color: #888;
+      cursor: pointer;
+      padding: 3px 8px 3px 5px;
+      border-radius: 20px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .legend-item:hover { border-color: #3a3a5a; color: #ccc; }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+    }
+    .legend-swatch {
+      width: 16px; height: 12px; border-radius: 3px; flex-shrink: 0;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #1a1a2e;
+      border: 1px solid #3a3a5a;
+      border-radius: 16px;
+      max-width: 540px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+    }
+    .modal-header {
+      padding: 20px 24px 14px;
+      border-bottom: 1px solid #2a2a4a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0;
+      background: #1a1a2e;
+      border-radius: 16px 16px 0 0;
+      z-index: 1;
+    }
+    .modal-date { font-size: 1.05rem; font-weight: 700; }
+    .modal-close {
+      background: #2a2a4a;
+      border: none;
+      color: #e8e8f0;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { background: #e040fb; }
+    .modal-body { padding: 16px 24px 20px; }
+    .modal-event {
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .modal-event:last-child { margin-bottom: 0; }
+    .modal-event-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .modal-event-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ticket-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 7px 16px;
+      background: linear-gradient(135deg, #e040fb, #7c4dff);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.03em;
+    }
+    .ticket-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .ticket-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .meta-tag {
+      font-size: 0.72rem;
+      background: rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 3px 10px;
+      color: #aaa;
+    }
+
+    /* Empty state */
+    .empty-month {
+      text-align: center;
+      padding: 60px 20px;
+      color: #555;
+      font-size: 0.95rem;
+    }
+    .empty-month .emoji { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+
+    @media (max-width: 700px) {
+      header { padding: 18px 16px 14px; }
+      h1 { font-size: 1.4rem; }
+      .subtitle { margin-left: 0; margin-top: 6px; }
+      .filters-bar { padding: 10px 16px; }
+      .calendar-wrap, .legend-wrap { padding-left: 8px; padding-right: 8px; }
+      .cal-cell { padding: 5px; }
+      .cal-grid { grid-auto-rows: 120px; }
+      .event-chip { font-size: 0.6rem; }
+      select { min-width: 130px; font-size: 0.82rem; }
+      .result-count { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <span class="header-icon">🎸</span>
+    <h1>Denver Concerts 2026</h1>
+  </div>
+  <div class="subtitle">Live music across Denver's greatest venues &mdash; Red Rocks, Ball Arena, Mission Ballroom &amp; more</div>
+  <div class="search-wrap" style="margin-top:14px;">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" class="search-input" id="artistSearch" placeholder="Search by artist name..." autocomplete="off">
+    <div class="search-dropdown" id="searchDropdown"></div>
+  </div>
+</header>
+
+<div class="filters-bar" style="flex-direction:column;align-items:stretch;">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span class="filter-label">Venue</span>
+    <div class="filter-chips" id="venueChips"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span class="filter-label">Genre</span>
+    <div class="filter-chips" id="genreChips"></div>
+  </div>
+  <div class="result-count" id="resultCount"><span>0</span> shows</div>
+</div>
+
+<div class="month-nav">
+  <button class="nav-btn" onclick="prevMonth()" title="Previous month">&#8249;</button>
+  <div class="month-label" id="monthLabel"></div>
+  <button class="nav-btn" onclick="nextMonth()" title="Next month">&#8250;</button>
+</div>
+<div class="month-dots" id="monthDots"></div>
+
+<div class="legend-wrap">
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="calendar-wrap">
+  <div class="cal-header-row">
+    <div class="cal-header-day">Sun</div>
+    <div class="cal-header-day">Mon</div>
+    <div class="cal-header-day">Tue</div>
+    <div class="cal-header-day">Wed</div>
+    <div class="cal-header-day">Thu</div>
+    <div class="cal-header-day">Fri</div>
+    <div class="cal-header-day">Sat</div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-date" id="modalDate"></div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ── CONCERT DATA ──────────────────────────────
+const CONCERTS = [
+
+  // ── MARCH ──
+  { date: '2026-03-04', name: 'Margo Price', venue: 'Gothic Theatre', genre: 'Country', support: '', ticketUrl: '' },
+  { date: '2026-03-10', name: 'Filter', venue: 'Ogden Theatre', genre: 'Rock', support: 'Finger Eleven, Local H', ticketUrl: '' },
+  { date: '2026-03-13', name: 'Maggie Lindemann', venue: 'Gothic Theatre', genre: 'Pop', support: '', ticketUrl: '' },
+  { date: '2026-03-14', name: 'The Strumbellas', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: '' },
+  { date: '2026-03-16', name: 'Indigo De Souza', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: '' },
+  { date: '2026-03-20', name: 'The California Honeydrops', venue: 'Mission Ballroom', genre: 'Rock', support: '', ticketUrl: '' },
+  { date: '2026-03-21', name: 'The Floozies', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: 'Thought Process', ticketUrl: '' },
+  { date: '2026-03-21', name: 'Eddie 9V', venue: 'Gothic Theatre', genre: 'Rock', support: '', ticketUrl: '' },
+  { date: '2026-03-23', name: 'Quarters', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Porch Light', ticketUrl: 'https://www.axs.com/events/1214448/quarters-tickets' },
+  { date: '2026-03-23', name: 'Chrissy Chlapecka', venue: 'Lost Lake Lounge', genre: 'Pop', support: 'ThatKid, SLAJER', ticketUrl: 'https://www.etix.com/ticket/p/94541446/chrissy-chlapecka-wthatkid-slajer-denver-lost-lake-lounge' },
+  { date: '2026-03-24', name: 'Evan Honer', venue: 'Ogden Theatre', genre: 'Country', support: 'Sam Burchfield', ticketUrl: 'https://www.axs.com/events/1146751/evan-honer-its-a-long-road-tour-tickets' },
+  { date: '2026-03-24', name: 'Spoon Benders', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'The Crooked Rugs, Night Fishing', ticketUrl: 'https://www.etix.com/ticket/p/36162527/spoon-benders-wthe-crooked-rugs-night-fishing-denver-lost-lake-lounge' },
+  { date: '2026-03-25', name: 'HR of Bad Brains', venue: 'Bluebird Theater', genre: 'Rock', support: 'Lola Rising', ticketUrl: 'https://www.axs.com/events/1307888/hr-of-bad-brains-tickets' },
+  { date: '2026-03-25', name: 'Slaughter To Prevail', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/slaughter-to-prevail-north-america-2026-denver-colorado-03-25-2026/event/1E006385DEE6D228' },
+  { date: '2026-03-26', name: 'St. Paul & The Broken Bones', venue: 'Mission Ballroom', genre: 'Rock', support: 'Tyler Ballgame', ticketUrl: 'https://www.axs.com/events/1162797/st-paul-the-broken-bones-tickets' },
+  { date: '2026-03-26', name: 'The Early November', venue: 'Gothic Theatre', genre: 'Rock', support: 'Hellogoodbye', ticketUrl: 'https://www.axs.com/events/1232796/the-early-november-hellogoodbye-tickets' },
+  { date: '2026-03-26', name: 'Charlie Parr', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'The Lowest Pair', ticketUrl: 'https://www.axs.com/events/1252021/charlie-parr-tickets' },
+  { date: '2026-03-26', name: 'Tokyo Tea Room', venue: 'Lost Lake Lounge', genre: 'Electronic/EDM', support: 'Kovoho', ticketUrl: 'https://www.etix.com/ticket/p/55457352/tokyo-tea-room-wkovoho-denver-lost-lake-lounge' },
+  { date: '2026-03-27', name: 'Gov\'t Mule', venue: 'Mission Ballroom', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1253997/govt-mule-tickets' },
+  { date: '2026-03-27', name: 'CrankDat / Dr. Fresch', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Smoakland, Capochino, HerShe', ticketUrl: 'https://www.axs.com/events/1206221/crankdat-tickets' },
+  { date: '2026-03-27', name: 'Yheti x lespecial x LIMINOID', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: '3420', ticketUrl: 'https://www.axs.com/events/1232793/yheti-x-lespecial-x-liminoid-tickets' },
+  { date: '2026-03-27', name: 'Red Leather', venue: 'Bluebird Theater', genre: 'Rock', support: 'The Romance', ticketUrl: 'https://www.axs.com/events/1273326/red-leather-tickets' },
+  { date: '2026-03-27', name: 'LAMB OF GOD', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/lamb-of-god-into-oblivion-tour-denver-colorado-03-27-2026/event/1E00636ECDF0984E' },
+  { date: '2026-03-27', name: 'EIDOLA', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/eidola-the-eviscerate-mend-tour-denver-colorado-03-27-2026/event/1E00636DD65CA6A7' },
+  { date: '2026-03-27', name: 'In Plain Air', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Faye, Little Bessie, Tidepool', ticketUrl: 'https://www.etix.com/ticket/p/60931079/in-plain-air-wfayelittle-bessie-tidepool-denver-lost-lake-lounge' },
+  { date: '2026-03-28', name: 'Ravenscoon & Jantsen', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'WonkyWilla, Jason Leech, Noetika, DEV', ticketUrl: 'https://www.axs.com/events/1160134/ravenscoon-jantsen-tickets' },
+  { date: '2026-03-28', name: 'Ashnikko', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1133582/ashnikko-tickets' },
+  { date: '2026-03-28', name: 'The Devil Wears Prada', venue: 'Summit Music Hall', genre: 'Metal', support: '', ticketUrl: 'https://www.ticketmaster.com/the-devil-wears-prada-flowers-tour-denver-colorado-03-28-2026/event/1E00636B46B5D1D4' },
+  { date: '2026-03-28', name: 'Pearly Drops', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/52960398/pearly-drops-denver-lost-lake-lounge' },
+  { date: '2026-03-28', name: 'Circles Around the Sun', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: 'Squeaky Feet', ticketUrl: 'https://www.axs.com/events/1255392/circles-around-the-sun-tickets' },
+  { date: '2026-03-28', name: '49th & Main', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1133207/49th-main-tickets' },
+  { date: '2026-03-28', name: 'How Sweet It Is W/ Melvin Seals & JGB, Pink Talking Fish & Steely Dead', venue: 'Fillmore Auditorium', genre: 'Jam Band', support: '', ticketUrl: 'https://www.ticketmaster.com/how-sweet-it-is-w-melvin-denver-colorado-03-28-2026/event/1E00638AB4A58370' },
+  { date: '2026-03-29', name: 'The Wonder Years', venue: 'Ogden Theatre', genre: 'Punk', support: 'Knuckle Puck, Initiate', ticketUrl: 'https://www.axs.com/events/1240840/the-wonder-years-tickets' },
+  { date: '2026-03-29', name: 'Landon Conrath', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Abby Holliday', ticketUrl: 'https://www.axs.com/events/1137225/landon-conrath-tickets' },
+  { date: '2026-03-29', name: 'Sticky Fingers', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/sticky-fingers-live-in-north-america-denver-colorado-03-29-2026/event/1E006350D01B7007' },
+  { date: '2026-03-29', name: 'Mella', venue: 'Summit Music Hall', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/mella-denver-colorado-03-29-2026/event/1E006462368944F4' },
+  { date: '2026-03-29', name: 'Episode 3', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Super 8, Folded Face, Oatmilk', ticketUrl: 'https://www.etix.com/ticket/p/82409397/episode-3-wsuper-8folded-face-oatmilk-denver-lost-lake-lounge' },
+  { date: '2026-03-30', name: 'Moontower', venue: 'Lost Lake Lounge', genre: 'Electronic/EDM', support: 'Slow Caves', ticketUrl: 'https://www.etix.com/ticket/p/53374266/moontower-wslow-caves-denver-lost-lake-lounge' },
+  { date: '2026-03-30', name: 'Mind Enterprises', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Jack Hamlin', ticketUrl: 'https://www.axs.com/events/1137187/mind-enterprises-tickets' },
+  { date: '2026-03-30', name: 'FKA twigs Body High Tour', venue: 'Fillmore Auditorium', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.ticketmaster.com/fka-twigs-body-high-tour-a-denver-colorado-03-30-2026/event/1E00637AEB17891C' },
+  { date: '2026-03-30', name: 'Machine Girl', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/machine-girl-psychowarrior-tour-denver-colorado-03-30-2026/event/1E00634C1D85456B' },
+  { date: '2026-03-31', name: 'Lacuna Coil', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/lacuna-coil-sleepless-empire-tour-2026-denver-colorado-03-31-2026/event/1E00638B189ED241' },
+  { date: '2026-03-31', name: 'Dear Maryann', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Ellie Siena', ticketUrl: 'https://www.etix.com/ticket/p/73640746/dear-maryann-wellie-siena-denver-lost-lake-lounge' },
+  // ── APRIL ──
+  { date: '2026-04-01', name: 'Cass McCombs + Band', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Chris Cohen', ticketUrl: 'https://www.axs.com/events/1189980/cass-mccombs-band-tickets' },
+  { date: '2026-04-01', name: 'IYLA', venue: 'Summit Music Hall', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/iyla-the-angel-tour-denver-colorado-04-01-2026/event/1E00643CAB86813A' },
+  { date: '2026-04-01', name: 'PRYVT', venue: 'Lost Lake Lounge', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.etix.com/ticket/p/42341378/pryvt-denver-lost-lake-lounge' },
+  { date: '2026-04-02', name: 'The Wood Brothers', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1218480/the-wood-brothers-tickets' },
+  { date: '2026-04-02', name: 'Arthur Ct.', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Bones of Life, Jackson Cloud', ticketUrl: 'https://www.etix.com/ticket/p/81462814/arthur-ctwbones-of-life-jackson-cloud-denver-lost-lake-lounge' },
+  { date: '2026-04-02', name: 'Gary Numan', venue: 'ReelWorks Denver', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://ritualnoize.com/events/82976/orders/new' },
+  { date: '2026-04-03', name: 'INZO', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'What So Not, Lumasi, Daggz', ticketUrl: 'https://www.axs.com/events/1157069/inzo-tickets' },
+  { date: '2026-04-03', name: 'Orbit Culture', venue: 'Gothic Theatre', genre: 'Metal', support: 'Ov Sulfur', ticketUrl: 'https://www.axs.com/events/1221439/orbit-culture-tickets' },
+  { date: '2026-04-03', name: 'The Maine', venue: 'Ogden Theatre', genre: 'Rock', support: 'NIGHTLY, Grayscale, Franklin Jonas & The Byzantines', ticketUrl: 'https://www.axs.com/events/1247271/i-love-you-but-i-chose-the-maine-tickets' },
+  { date: '2026-04-03', name: 'Voxtrot', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Swarming Branch', ticketUrl: 'https://www.axs.com/events/1239268/voxtrot-tickets' },
+  { date: '2026-04-03', name: 'Caroline Jones', venue: 'Lost Lake Lounge', genre: 'Country', support: 'Alyssa Bonagura', ticketUrl: 'https://www.etix.com/ticket/p/96703796/caroline-jones-walyssa-bonagura-denver-lost-lake-lounge' },
+  { date: '2026-04-03', name: 'Yousuke Yukimatsu', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: 'Galcher Lustwerk, Lorely Mur', ticketUrl: 'https://www.axs.com/events/1297769/yousuke-yukimatsu-you-uky-yuk1mat-u-tickets' },
+  { date: '2026-04-03', name: 'JSTJR', venue: 'Summit Music Hall', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.ticketmaster.com/jstjr-18-denver-colorado-04-03-2026/event/1E00636B18BFBF79' },
+  { date: '2026-04-04', name: 'it\'s murph (Murph Rocks)', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'D.O.D, oskar med k, me n ü', ticketUrl: 'https://www.axs.com/events/1160184/it-s-murph-presents-murph-rocks-tickets' },
+  { date: '2026-04-04', name: 'Meldrop', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Lavalove, Experimental Brunch', ticketUrl: 'https://www.etix.com/ticket/p/88397786/meldrop-wlavalove-experimental-brunch-denver-lost-lake-lounge' },
+  { date: '2026-04-04', name: 'Jaenga', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: 'Josh Teed, Pretty Sweet, Auracle, Wesley Mack', ticketUrl: 'https://www.axs.com/events/1213691/jaenga-tickets' },
+  { date: '2026-04-04', name: 'Magoo', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Deer Creek Sharp Shooters', ticketUrl: 'https://www.axs.com/events/1239148/magoo-tickets' },
+  { date: '2026-04-04', name: 'Mindchatter', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: 'Aka Vinnie', ticketUrl: 'https://www.axs.com/events/1206219/mindchatter-tickets' },
+  { date: '2026-04-04', name: 'Currents & ERRA', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/currents-erra-the-silence-follows-tour-denver-colorado-04-04-2026/event/1E006367DAD59012' },
+  { date: '2026-04-05', name: 'Marissa Nadler', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Anand Wilder', ticketUrl: 'https://www.etix.com/ticket/p/56911752/marissa-nadler-wanand-wilder-of-yeasayer-denver-lost-lake-lounge' },
+  { date: '2026-04-05', name: 'Koffin Kats', venue: 'Bluebird Theater', genre: 'Rock', support: 'Carrie Nation and the Speakeasy', ticketUrl: 'https://www.axs.com/events/1300361/koffin-kats-tickets' },
+  { date: '2026-04-06', name: 'Raye', venue: 'Fillmore Auditorium', genre: 'Pop', support: '', ticketUrl: 'https://www.ticketmaster.com/raye-this-tour-may-contain-new-denver-colorado-04-06-2026/event/1E006331EF936BC2' },
+  { date: '2026-04-06', name: 'Drain', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/drain-denver-colorado-04-06-2026/event/1E006367EBA39CD0' },
+  { date: '2026-04-07', name: 'LANY', venue: 'Mission Ballroom', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1161894/lany-tickets' },
+  { date: '2026-04-07', name: 'Microwave', venue: 'Ogden Theatre', genre: 'Rock', support: 'Anthony Green', ticketUrl: 'https://www.axs.com/events/1241061/microwave-much-love-10-year-anniversary-tour-tickets' },
+  { date: '2026-04-07', name: 'The Red Pears & Together Pangea', venue: 'Bluebird Theater', genre: 'Rock', support: 'The High Curbs', ticketUrl: 'https://www.axs.com/events/1268478/the-red-pears-together-pangea-tickets' },
+  { date: '2026-04-07', name: 'Dave', venue: 'Summit Music Hall', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/dave-denver-colorado-04-07-2026/event/1E006383F088F6AF' },
+  { date: '2026-04-07', name: 'Miles Minnick', venue: 'Lost Lake Lounge', genre: 'Hip-Hop/Rap', support: 'Tommy Zuko', ticketUrl: 'https://www.etix.com/ticket/p/85318529/miles-minnick-new-mainstream-tour-wtommy-zuko-denver-lost-lake-lounge' },
+  { date: '2026-04-08', name: 'HEALTH x Carpenter Brut', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: 'Desire', ticketUrl: 'https://www.axs.com/events/1145151/health-x-carpenter-brut-tickets' },
+  { date: '2026-04-08', name: 'GoldFord', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: 'Rett Madison', ticketUrl: 'https://www.axs.com/events/1141480/goldford-tickets' },
+  { date: '2026-04-08', name: 'Ritt Momney', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1317771/ritt-momney-tickets' },
+  { date: '2026-04-09', name: 'Lily Rose', venue: 'Summit Music Hall', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/lily-rose-i-know-what-i-denver-colorado-04-09-2026/event/1E006439B5038390' },
+  { date: '2026-04-09', name: 'Al Olender', venue: 'Lost Lake Lounge', genre: 'Country', support: 'Ahna Ell', ticketUrl: 'https://www.etix.com/ticket/p/70697535/al-olender-wahna-ell-denver-lost-lake-lounge' },
+  { date: '2026-04-10', name: 'Zingara & Level Up', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Saka, SubDocta, Slang Dogs', ticketUrl: 'https://www.axs.com/events/1240608/zingara-level-up-tickets' },
+  { date: '2026-04-10', name: 'The Format', venue: 'Mission Ballroom', genre: 'Rock', support: 'Phantom Planet, Limbeck', ticketUrl: 'https://www.axs.com/events/1170046/the-format-tickets' },
+  { date: '2026-04-10', name: 'Lexa Gates', venue: 'Gothic Theatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1301069/lexa-gates-tickets' },
+  { date: '2026-04-10', name: 'The Nude Party', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Tobacco City, D.B. Trooper', ticketUrl: 'https://www.axs.com/events/1185189/the-nude-party-tickets' },
+  { date: '2026-04-10', name: 'Freddie Dredd', venue: 'Summit Music Hall', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.ticketmaster.com/freddie-dredd-denver-colorado-04-10-2026/event/1E00644AB93082E3' },
+  { date: '2026-04-10', name: 'Patema', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'LightStory, VoidAtlas, Angels In Electric Chairs', ticketUrl: 'https://www.etix.com/ticket/p/94339445/patema-wlightstoryvoidatlas-angels-in-electric-chairs-denver-lost-lake-lounge' },
+  { date: '2026-04-11', name: 'Liquid Stranger', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'TVBOO b2b AHEE, AVELLO', ticketUrl: 'https://www.axs.com/events/1191989/wakaan-rocks-liquid-stranger-tickets' },
+  { date: '2026-04-11', name: 'MXPX', venue: 'Mission Ballroom', genre: 'Punk', support: '', ticketUrl: 'https://www.axs.com/events/1243115/mxpx-tickets' },
+  { date: '2026-04-11', name: 'D.R.I.', venue: 'Gothic Theatre', genre: 'Metal', support: '', ticketUrl: 'https://www.axs.com/events/1258968/d-r-i-tickets' },
+  { date: '2026-04-11', name: 'Kasablanca', venue: 'ReelWorks Denver', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1297786/kasablanca-tickets' },
+  { date: '2026-04-11', name: 'Caiola', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1223099/caiola-tickets' },
+  { date: '2026-04-11', name: 'Dance With The Dead + Magic Sword', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/dance-with-the-dead-magic-sword-denver-colorado-04-11-2026/event/1E00637AC19975ED' },
+  { date: '2026-04-11', name: 'Kyle Szalay', venue: 'Lost Lake Lounge', genre: 'Country', support: 'Grayson Ratliff, Belles of Bisbee', ticketUrl: 'https://www.etix.com/ticket/p/31929791/kyle-szalay-wgrayson-ratliffbelles-of-bisbee-denver-lost-lake-lounge' },
+  { date: '2026-04-12', name: 'Fcukers', venue: 'Gothic Theatre', genre: 'Rock', support: 'Sex Week', ticketUrl: 'https://www.axs.com/events/1288608/fcukers-tickets' },
+  { date: '2026-04-12', name: 'MarchFourth', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1290679/marchfourth-tickets' },
+  { date: '2026-04-12', name: 'Slomosa', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Psychlona, Mercia', ticketUrl: 'https://www.etix.com/ticket/p/46771375/slomosa-wpsychlonamercia-denver-lost-lake-lounge' },
+  { date: '2026-04-13', name: 'Ratboys', venue: 'Bluebird Theater', genre: 'Rock', support: 'villagerrr', ticketUrl: 'https://www.axs.com/events/1145132/ratboys-tickets' },
+  { date: '2026-04-13', name: 'NETTSPEND', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/nettspend-early-life-crisis-tour-denver-colorado-04-13-2026/event/1E00644CE7892358' },
+  { date: '2026-04-14', name: 'SatchVai Band (Joe Satriani & Steve Vai)', venue: 'Mission Ballroom', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1247253/satchvai-band-ft-joe-satriani-steve-vai-tickets' },
+  { date: '2026-04-14', name: 'Twice', venue: 'Ball Arena', genre: 'Pop', support: 'This Is For World Tour', ticketUrl: 'https://www.ticketmaster.com/twice-this-is-for-world-tour-denver-colorado-04-14-2026/event/1E006339C7C54145' },
+  { date: '2026-04-14', name: 'VIAL', venue: 'Lost Lake Lounge', genre: 'Punk', support: 'Alex Vile', ticketUrl: 'https://www.etix.com/ticket/p/76782094/vial-walex-vile-team-nonexistent-denver-lost-lake-lounge' },
+  { date: '2026-04-14', name: 'Dabeull Live Band', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1324699/dabeull-live-band-tickets' },
+  { date: '2026-04-14', name: 'Die Krupps', venue: 'Bluebird Theater', genre: 'Rock', support: 'ghostbells', ticketUrl: 'https://www.axs.com/events/1253314/die-krupps-tickets' },
+  { date: '2026-04-15', name: 'Hatsune Miku', venue: 'Mission Ballroom', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1194625/hatsune-miku-tickets' },
+  { date: '2026-04-15', name: 'Fishbone', venue: 'Bluebird Theater', genre: 'Rock', support: 'Dead Pioneers, Bite Me Bambi', ticketUrl: 'https://www.axs.com/events/1270734/fishbone-in-your-face-40th-anniversary-tour-tickets' },
+  { date: '2026-04-15', name: 'Free Throw', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/free-throw-moments-before-the-wind-denver-colorado-04-15-2026/event/1E00642DE612AA64' },
+  { date: '2026-04-15', name: 'Dead Tooth', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'The Foxhunt, Moon Pearl', ticketUrl: 'https://www.etix.com/ticket/p/46459714/dead-tooth-wthe-foxhuntmoon-pearl-denver-lost-lake-lounge' },
+  { date: '2026-04-16', name: 'bbno$ w/ Oliver Tree', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: 'Kaarija, YNG Martyr, Jungle Bobby', ticketUrl: 'https://www.axs.com/events/1180778/bbno-w-special-guest-oliver-tree-tickets' },
+  { date: '2026-04-16', name: 'Warren Zeiders', venue: 'Mission Ballroom', genre: 'Country', support: 'Lakeview', ticketUrl: 'https://www.axs.com/events/1215544/warren-zeiders-tickets' },
+  { date: '2026-04-16', name: 'Rickshaw Billie\'s Burger Patrol', venue: 'Bluebird Theater', genre: 'Rock', support: 'Pink Fuzz, American Sharks', ticketUrl: 'https://www.axs.com/events/1326868/rickshaw-billie-s-burger-patrol-tickets' },
+  { date: '2026-04-16', name: 'Dylan Reese & Adam Yokum', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Sean Patek', ticketUrl: 'https://www.etix.com/ticket/p/92509950/dylan-reese-adam-yokum-wsean-patek-denver-lost-lake-lounge' },
+  { date: '2026-04-17', name: 'Sublime', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Common Kings, Bumpin Uglies, Fayuca', ticketUrl: 'https://www.axs.com/events/1184592/sublime-tickets' },
+  { date: '2026-04-17', name: 'Cory Wong', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1222553/cory-wong-tickets' },
+  { date: '2026-04-17', name: 'Pete Yorn', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1143331/pete-yorn-25th-anniversary-of-musicforthemorningafter-tickets' },
+  { date: '2026-04-17', name: 'Ganja White Night', venue: 'Gothic Theatre', genre: 'Electronic/EDM', support: 'with Special Guests', ticketUrl: 'https://www.axs.com/events/1363600/ganja-white-night-cloud-city-late-nights-tickets' },
+  { date: '2026-04-17', name: 'Know Good', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: 'Blookah, Terminal 6, Shmani', ticketUrl: 'https://www.axs.com/events/1259245/know-good-tickets' },
+  { date: '2026-04-17', name: 'Bleed From Within', venue: 'Bluebird Theater', genre: 'Rock', support: 'Sylosis, Great American Ghost, Life Cycles', ticketUrl: 'https://www.axs.com/events/1231124/bleed-from-within-tickets' },
+  { date: '2026-04-17', name: 'Ganja White Night: Cloud City Music Festival', venue: "Fiddler's Green Amphitheatre", genre: 'Electronic/EDM', support: 'Boogie T, Chief Kaya, DJ MADD, Father Funk, Jesse Royal, Know Good, Oddly Easy, Packet Loss, Richard Finger, Sister Nancy, Togeki, VEIL, Zoska', ticketUrl: 'https://www.axs.com/events/1255613/ganja-white-night-cloud-city-music-festival-tickets' },
+  { date: '2026-04-17', name: 'Bilmuri', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/bilmuri-kinda-hard-tour-denver-colorado-04-17-2026/event/1E006384D0849828' },
+  { date: '2026-04-17', name: 'GIRL DINNER', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'John F. Ketamine, Milli Shaw, Sol Source', ticketUrl: 'https://www.etix.com/ticket/p/46444838/girl-dinner-wjohn-fketaminemilli-shaw-sol-source-denver-lost-lake-lounge' },
+  { date: '2026-04-18', name: 'Sublime', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Pepper, Codefendants', ticketUrl: 'https://www.axs.com/events/1184605/sublime-tickets' },
+  { date: '2026-04-18', name: 'Ty Segall', venue: 'Ogden Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1157076/ty-segall-tickets' },
+  { date: '2026-04-18', name: 'YOUTHYEAR', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/50362070/letdownwblame-my-youthyouthyear-luchiano-denver-lost-lake-lounge' },
+  { date: '2026-04-18', name: 'Tyler Braden', venue: 'Gothic Theatre', genre: 'Hip-Hop/Rap', support: 'Clayton Mullen', ticketUrl: 'https://www.axs.com/events/1185877/tyler-braden-tickets' },
+  { date: '2026-04-18', name: 'Ganja White Night', venue: 'Gothic Theatre', genre: 'Electronic/EDM', support: 'with Special Guests', ticketUrl: 'https://www.axs.com/events/1363604/ganja-white-night-cloud-city-late-nights-tickets' },
+  { date: '2026-04-18', name: 'Ganja White Night: Cloud City Music Festival', venue: "Fiddler's Green Amphitheatre", genre: 'Electronic/EDM', support: 'Boogie T.rio, Champagne Drip, Coki, Don Jamal, Dub FX, Secret Guest, Subatomic Sound System + Screechy Dan, TRUTH, Wraz, Youngsta, Zion Marley', ticketUrl: 'https://www.axs.com/events/1255615/ganja-white-night-cloud-city-music-festival-tickets' },
+  { date: '2026-04-18', name: 'Stephen Wilson Jr.', venue: 'Mission Ballroom', genre: 'Metal', support: 'Ashley Monroe', ticketUrl: 'https://www.axs.com/events/1081279/stephen-wilson-jr-tickets' },
+  { date: '2026-04-18', name: 'TWRP', venue: 'Summit Music Hall', genre: 'Punk', support: '', ticketUrl: 'https://www.ticketmaster.com/twrp-denver-colorado-04-18-2026/event/1E00643EF7ADF28F' },
+  { date: '2026-04-18', name: 'Letdown.', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Blame My Youth, YOUTHYEAR, LUCHIANO', ticketUrl: 'https://www.etix.com/ticket/p/50362070/letdownwblame-my-youthyouthyear-luchiano-denver-lost-lake-lounge' },
+  { date: '2026-04-18', name: 'Lee Foss x Doc Martin', venue: 'ReelWorks Denver', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://aftontickets.com/event/buyticket/3px8e1lzx1' },
+  { date: '2026-04-19', name: 'Wiz Khalifa', venue: 'Red Rocks Amphitheatre', genre: 'Hip-Hop/Rap', support: '2 Chainz, Berner, The Underachievers, Chevy Woods, DJ Bonics', ticketUrl: 'https://www.axs.com/events/1297700/wiz-khalifa-tickets' },
+  { date: '2026-04-19', name: 'Chris Webby', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Token, NEVV, Affliction Music', ticketUrl: 'https://www.axs.com/events/1286678/chris-webby-tickets' },
+  { date: '2026-04-19', name: 'Thursday', venue: 'Summit Music Hall', genre: 'Punk', support: '', ticketUrl: 'https://www.ticketmaster.com/thursday-presents-full-city-devolucion-with-denver-colorado-04-19-2026/event/1E00642EEC10C063' },
+  { date: '2026-04-19', name: 'Donaven', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Anne Elise, waxpool, Keddjra', ticketUrl: 'https://www.etix.com/ticket/p/67591778/donaven-wanne-elisewaxpool-keddjra-denver-lost-lake-lounge' },
+  { date: '2026-04-20', name: 'Ice Cube', venue: 'Red Rocks Amphitheatre', genre: 'Hip-Hop/Rap', support: 'Too Short, Czarface ft. Inspectah Deck', ticketUrl: 'https://www.axs.com/events/1282553/ice-cube-tickets' },
+  { date: '2026-04-20', name: 'Sunn O))))', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: 'Gentry Densley', ticketUrl: 'https://www.axs.com/events/1290178/sunn-o-tickets' },
+  { date: '2026-04-21', name: 'Ethel Cain', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: '9Million', ticketUrl: 'https://www.axs.com/events/1241775/ethel-cain-tickets' },
+  { date: '2026-04-21', name: 'Cobrah', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1316280/cobrah-torn-tour-tickets' },
+  { date: '2026-04-21', name: 'Brigitte Calls Me Baby', venue: 'Bluebird Theater', genre: 'Rock', support: 'SKORTS', ticketUrl: 'https://www.axs.com/events/1283562/brigitte-calls-me-baby-tickets' },
+  { date: '2026-04-22', name: 'Dustin Lynch & Chase Rice', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1321789/dustin-lynch-chase-rice-tickets' },
+  { date: '2026-04-22', name: 'Behemoth', venue: 'Fillmore Auditorium', genre: 'Metal', support: '', ticketUrl: 'https://www.ticketmaster.com/behemoth-the-godless-iv-2026-denver-colorado-04-22-2026/event/1E006429AF4A75B6' },
+  { date: '2026-04-22', name: 'Oklou', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1203586/oklou-tickets' },
+  { date: '2026-04-22', name: 'Dave East', venue: 'The Roxy Theatre', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.bandsintown.com/e/107994641-dave-east-at-the-roxy-theater' },
+  { date: '2026-04-22', name: 'Model/Actriz', venue: 'Bluebird Theater', genre: 'Rock', support: 'Agriculture', ticketUrl: 'https://www.axs.com/events/1231103/model-actriz-tickets' },
+  { date: '2026-04-23', name: 'Subtronics: Cyclops Rocks VI', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Hedex, Cyclops, Mythm, Gardella, St. Mary', ticketUrl: 'https://www.axs.com/events/1161693/subtronics-cyclops-rocks-vi-tickets' },
+  { date: '2026-04-23', name: 'Snow Tha Product', venue: 'Ogden Theatre', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1240592/snow-tha-product-tickets' },
+  { date: '2026-04-23', name: 'Disclosure Live', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1374099/disclosure-live-tickets' },
+  { date: '2026-04-23', name: 'Maya Hawke', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1329867/an-evening-with-maya-hawke-tickets' },
+  { date: '2026-04-23', name: 'Shadow of Intent', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/shadow-of-intent-imperium-delirium-north-denver-colorado-04-23-2026/event/1E006381DBF08CF9' },
+  { date: '2026-04-23', name: 'Ashes to Amber', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Nature TV, Gestalt', ticketUrl: 'https://www.etix.com/ticket/p/59175676/ashes-to-amber-wnature-tv-gestalt-denver-lost-lake-lounge' },
+  { date: '2026-04-24', name: 'Subtronics: Cyclops Rocks VI', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'KOAN Sound, Effin, DENNETT, Rohaan, KLO', ticketUrl: 'https://www.axs.com/events/1161702/subtronics-cyclops-rocks-vi-tickets' },
+  { date: '2026-04-24', name: 'Disclosure Live', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1374102/disclosure-live-tickets' },
+  { date: '2026-04-24', name: 'moe.', venue: 'Ogden Theatre', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1268710/moe-tickets' },
+  { date: '2026-04-24', name: 'Vincent Neil Emerson', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1298165/vincent-neil-emerson-tickets' },
+  { date: '2026-04-24', name: 'DRINKURWATER', venue: 'Summit Music Hall', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.ticketmaster.com/drinkurwater-presents-the-bass-bottle-tour-denver-colorado-04-24-2026/event/1E006381AA747268' },
+  { date: '2026-04-24', name: 'The Back Alley', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Ronjo V', ticketUrl: 'https://www.etix.com/ticket/p/52349129/the-back-alley-wronjo-v-denver-lost-lake-lounge' },
+  { date: '2026-04-25', name: 'Alesso', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Lost Frequencies, Surf Mesa', ticketUrl: 'https://www.axs.com/events/1268704/alesso-tickets' },
+  { date: '2026-04-25', name: 'Disclosure Live', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1374105/disclosure-live-tickets' },
+  { date: '2026-04-25', name: 'moe.', venue: 'Ogden Theatre', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1268717/moe-tickets' },
+  { date: '2026-04-25', name: 'Kaivon', venue: 'ReelWorks Denver', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1220413/kaivon-tickets' },
+  { date: '2026-04-25', name: 'Tourist', venue: 'Gothic Theatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1255191/tourist-tickets' },
+  { date: '2026-04-25', name: 'Vincent Neil Emerson', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1298168/vincent-neil-emerson-tickets' },
+  { date: '2026-04-25', name: 'Noah Guy', venue: 'Lost Lake Lounge', genre: 'Hip-Hop/Rap', support: 'Brandon', ticketUrl: 'https://www.etix.com/ticket/p/90994961/noah-guy-wbrandon-denver-lost-lake-lounge' },
+  { date: '2026-04-26', name: 'Bob Moses & Cannons', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1271055/bob-moses-cannons-tickets' },
+  { date: '2026-04-26', name: 'Ben Harper & The Innocent Criminals', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1316462/ben-harper-the-innocent-criminals-tickets' },
+  { date: '2026-04-26', name: 'Ari Lennox', venue: 'Summit Music Hall', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/ari-lennox-the-vacancy-tour-denver-colorado-04-26-2026/event/1E006464DE30E1C0' },
+  { date: '2026-04-26', name: 'Heron', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Driftwood Serenade', ticketUrl: 'https://www.etix.com/ticket/p/58826627/heron-wdriftwood-serenade-denver-lost-lake-lounge' },
+  { date: '2026-04-27', name: 'Grace Ives', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1335609/grace-ives-tickets' },
+  { date: '2026-04-27', name: 'Suntitle', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Rooftop View, Slow Blink', ticketUrl: 'https://www.etix.com/ticket/p/60746296/suntitle-wrooftop-viewslow-blink-denver-lost-lake-lounge' },
+  { date: '2026-04-28', name: 'Lewis Capaldi', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: 'Joy Crookes', ticketUrl: 'https://www.axs.com/events/1267026/lewis-capaldi-tickets' },
+  { date: '2026-04-28', name: 'femtanyl', venue: 'Bluebird Theater', genre: 'Rock', support: 'Bejalvin, takihasdied', ticketUrl: 'https://www.axs.com/events/1223657/femtanyl-tickets' },
+  { date: '2026-04-28', name: 'Josiah Queen', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/josiah-queen-the-mt-zion-tour-denver-colorado-04-28-2026/event/1E00631BDFC34766' },
+  { date: '2026-04-28', name: 'Mint Green', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Cardboard Rocketship, Oatmilk', ticketUrl: 'https://www.etix.com/ticket/p/89116750/mint-green-wcardboard-rocketshipoatmilk-denver-lost-lake-lounge' },
+  { date: '2026-04-29', name: 'Lewis Capaldi', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: 'Joy Crookes', ticketUrl: 'https://www.axs.com/events/1267033/lewis-capaldi-tickets' },
+  { date: '2026-04-29', name: 'Powfu', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Jomie, Ouse', ticketUrl: 'https://www.axs.com/events/1288325/powfu-presents-the-lofi-library-tour-tickets' },
+  { date: '2026-04-29', name: 'BADBADNOTGOOD', venue: 'Summit Music Hall', genre: 'Jam Band', support: '', ticketUrl: 'https://www.ticketmaster.com/badbadnotgood-denver-colorado-04-29-2026/event/1E006429AFED762E' },
+  { date: '2026-04-30', name: 'Electric Callboy', venue: 'Red Rocks Amphitheatre', genre: 'Metal', support: 'Polaris, Scene Queen', ticketUrl: 'https://www.axs.com/events/1246178/electric-callboy-tickets' },
+  { date: '2026-04-30', name: 'The Growlers', venue: 'Ogden Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1281746/the-growlers-tickets' },
+  { date: '2026-04-30', name: 'Taylor Wolfe & Friends', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1362209/once-a-carnie-always-a-carnie-just-a-busy-season-book-tour-with-taylor-tickets' },
+  { date: '2026-04-30', name: 'Petite League', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'The Sickly Hecks', ticketUrl: 'https://www.etix.com/ticket/p/54574685/petite-league-wthe-sickly-hecks-denver-lost-lake-lounge' },
+  // ── MAY ──
+  { date: '2026-05-01', name: 'Two Friends', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'ARMNHMR, Leondis', ticketUrl: 'https://www.axs.com/events/1247831/two-friends-tickets' },
+  { date: '2026-05-01', name: 'Jason Isbell & the 400 Unit', venue: 'Mission Ballroom', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1209775/jason-isbell-and-the-400-unit-tickets' },
+  { date: '2026-05-01', name: 'Black Veil Brides', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/black-veil-brides-north-american-tour-denver-colorado-05-01-2026/event/1E006434F272A7E7' },
+  { date: '2026-05-01', name: 'ENTER AFTERLIFE', venue: 'Gothic Theatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1189660/witchz-presents-enter-afterlife-tickets' },
+  { date: '2026-05-01', name: 'Beauz', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: 'MADGRRL', ticketUrl: 'https://www.axs.com/events/1232777/beauz-tickets' },
+  { date: '2026-05-01', name: 'The Fretliners', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1304816/the-fretliners-tickets' },
+  { date: '2026-05-01', name: 'SEVENDUST', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/sevendust-one-tour-denver-colorado-05-01-2026/event/1E00637ACAAB8A74' },
+  { date: '2026-05-01', name: 'Sam Blasucci', venue: 'Lost Lake Lounge', genre: 'Country', support: 'Sam Burton', ticketUrl: 'https://www.etix.com/ticket/p/34447027/sam-blasucci-wsam-burton-denver-lost-lake-lounge' },
+  { date: '2026-05-02', name: 'Jason Isbell & the 400 Unit', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Gillian Welch & David Rawlings', ticketUrl: 'https://www.axs.com/events/1235534/jason-isbell-and-the-400-unit-tickets' },
+  { date: '2026-05-02', name: 'August Burns Red', venue: 'Fillmore Auditorium', genre: 'Metal', support: 'The Amity Affliction', ticketUrl: 'https://www.ticketmaster.com/august-burns-red-the-amity-affliction-denver-colorado-05-02-2026/event/1E006375A54F837B' },
+  { date: '2026-05-02', name: 'Benjamin Tod', venue: 'Ogden Theatre', genre: 'Jam Band', support: 'Colton Bowlin, Johno Leeroy', ticketUrl: 'https://www.axs.com/events/1213981/benjamin-tod-tickets' },
+  { date: '2026-05-02', name: 'Langhorne Slim', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Laney Jones and the Spirits', ticketUrl: 'https://www.axs.com/events/1222546/langhorne-slim-the-dreamin-kind-tour-tickets' },
+  { date: '2026-05-02', name: 'Rusko', venue: 'Summit Music Hall', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.ticketmaster.com/rusko-18-denver-colorado-05-02-2026/event/1E00644AAF5975FA' },
+  { date: '2026-05-03', name: 'Puscifer', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Dave Hill', ticketUrl: 'https://www.axs.com/events/1227979/puscifer-tickets' },
+  { date: '2026-05-03', name: 'Mac DeMarco', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1252721/mac-demarco-tickets' },
+  { date: '2026-05-03', name: 'The Brook & The Bluff', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1218490/the-brook-the-bluff-tickets' },
+  { date: '2026-05-03', name: 'Zinadelphia', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1288850/zinadelphia-zina-s-boutique-tickets' },
+  { date: '2026-05-03', name: 'Bush', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/bush-the-land-of-milk-and-denver-colorado-05-03-2026/event/1E00638F9B2F54D9' },
+  { date: '2026-05-03', name: 'The Toxhards', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Boris', ticketUrl: 'https://www.etix.com/ticket/p/58429248/the-toxhards-wboris-denver-lost-lake-lounge' },
+  { date: '2026-05-04', name: 'Joyce Manor, Militarie Gun, Teen Mortgage, & Combat', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/joyce-manor-militarie-gun-teen-mortgage-denver-colorado-05-04-2026/event/1E006343D3255765' },
+  { date: '2026-05-05', name: 'David Guetta', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Miss Monique', ticketUrl: 'https://www.axs.com/events/1270759/david-guetta-tickets' },
+  { date: '2026-05-05', name: 'Demi Lovato', venue: 'Ball Arena', genre: 'Pop', support: "It's Not That Deep Tour", ticketUrl: 'https://www.ticketmaster.com/demi-lovato-its-not-that-deep-denver-colorado-05-05-2026/event/1E0063589A0D3268' },
+  { date: '2026-05-05', name: 'Jared Benjamin', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/89675661/jared-benjamin-denver-lost-lake-lounge' },
+  { date: '2026-05-05', name: 'The New Pornographers', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Will Sheff (of Okkervil River)', ticketUrl: 'https://www.axs.com/events/1223658/the-new-pornographers-tickets' },
+  { date: '2026-05-05', name: 'Melrose Avenue', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Autumn Kings, Stray View', ticketUrl: 'https://www.axs.com/events/1165179/melrose-avenue-tickets' },
+  { date: '2026-05-05', name: 'La Dispute', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/la-dispute-denver-colorado-05-05-2026/event/1E006349C1F926AD' },
+  { date: '2026-05-06', name: 'Bright Eyes', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1230891/bright-eyes-tickets' },
+  { date: '2026-05-06', name: 'The Midnight', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1174870/the-midnight-tickets' },
+  { date: '2026-05-06', name: 'Emo Orchestra with The Spill Canvas', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1226175/emo-orchestra-with-the-spill-canvas-tickets' },
+  { date: '2026-05-06', name: 'Cut Worms', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Angela Autumn', ticketUrl: 'https://www.axs.com/events/1284076/cut-worms-tickets' },
+  { date: '2026-05-06', name: 'DaBaby', venue: 'Summit Music Hall', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/dababy-denver-colorado-05-06-2026/event/1E00643EDE1CA8BD' },
+  { date: '2026-05-06', name: 'Hollow Like Her', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Buried In Lies, Reap The Haunted, Scars Over Graves', ticketUrl: 'https://www.etix.com/ticket/p/80418180/black-dagger-presents-hollow-like-her-wburied-in-liesreap-the-haunted-scars-over-graves-denver-lost-lake-lounge' },
+  { date: '2026-05-07', name: 'Wage War', venue: 'Ogden Theatre', genre: 'Metal', support: '', ticketUrl: 'https://www.axs.com/events/1280841/wage-war-tickets' },
+  { date: '2026-05-07', name: 'Vana', venue: 'Bluebird Theater', genre: 'Rock', support: 'Cloudyfield, Deadlands, Red Hook', ticketUrl: 'https://www.axs.com/events/1216499/vana-tickets' },
+  { date: '2026-05-07', name: 'Poison the Well', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/poison-the-well-peace-in-place-denver-colorado-05-07-2026/event/1E00642F4026FA12' },
+  { date: '2026-05-07', name: 'Homestyle Dinner Rolls', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/35212250/homestyle-dinner-rolls-denver-lost-lake-lounge' },
+  { date: '2026-05-08', name: 'ALLEYCVT: Supersonic Rocks', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Habstrakt, Tynan, Costa, Tazu', ticketUrl: 'https://www.axs.com/events/1267764/alleycvt-supersonic-rocks-tickets' },
+  { date: '2026-05-08', name: 'maye & Ambar Lucid', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1308086/maye-ambar-lucid-tickets' },
+  { date: '2026-05-08', name: 'William Black', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1256397/william-black-tickets' },
+  { date: '2026-05-08', name: 'Shakedown Street', venue: 'Bluebird Theater', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1354846/shakedown-street-tickets' },
+  { date: '2026-05-08', name: 'John Butler', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1273335/john-butler-with-band-tickets' },
+  { date: '2026-05-08', name: 'Sophia Stel', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/92488817/sophia-stel-denver-lost-lake-lounge' },
+  { date: '2026-05-09', name: 'Cloonee', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'KETTAMA, Omar+, Cole Knight', ticketUrl: 'https://www.axs.com/events/1252700/cloonee-tickets' },
+  { date: '2026-05-09', name: 'Eldren (performing "Illinois" by Sufjan Stevens)', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Pillow Fort, Lady Denim', ticketUrl: 'https://www.axs.com/events/1326864/eldren-perform-illinois-by-sufjan-stevens-tickets' },
+  { date: '2026-05-09', name: 'Ransom Camp', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: 'Wodd, sfam, BIG BLOK', ticketUrl: 'https://www.axs.com/events/1303201/hostage-situation-presents-ransom-camp-tickets' },
+  { date: '2026-05-09', name: 'Allie X', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1213693/allie-x-tickets' },
+  { date: '2026-05-09', name: 'Vincent Antone & Manic Focus', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: 'Pheel., Phyphr, Kaptain', ticketUrl: 'https://www.axs.com/events/1291909/vincent-antone-manic-focus-tickets' },
+  { date: '2026-05-10', name: 'Hippie Sabotage', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Danny Brown, Kembe X', ticketUrl: 'https://www.axs.com/events/1266223/hippie-sabotage-tickets' },
+  { date: '2026-05-10', name: 'Cabaret Voltaire', venue: 'Summit Music Hall', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.ticketmaster.com/cabaret-voltaire-denver-colorado-05-10-2026/event/1E006430BE55A311' },
+  { date: '2026-05-11', name: 'Yungblud', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Return To Dust', ticketUrl: 'https://www.axs.com/events/1241779/yungblud-tickets' },
+  { date: '2026-05-11', name: 'José González', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1268031/jose-gonzalez-tickets' },
+  { date: '2026-05-11', name: 'Easy Honey', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'The Galentines', ticketUrl: 'https://www.etix.com/ticket/p/47202077/easy-honey-wthe-galentines-denver-lost-lake-lounge' },
+  { date: '2026-05-12', name: 'Tech N9ne & E-40', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/tech-n9ne-e40-denver-colorado-05-12-2026/event/1E006462AF7C8EFD' },
+  { date: '2026-05-12', name: 'The Afghan Whigs & Mercury Rev', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/the-afghan-whigs-40th-anniversary-tour-denver-colorado-05-12-2026/event/1E00642F49B8FDBD' },
+  { date: '2026-05-12', name: 'Chloe Kimes', venue: 'Lost Lake Lounge', genre: 'Country', support: '', ticketUrl: 'https://www.etix.com/ticket/p/42281581/chloe-kimes-denver-lost-lake-lounge' },
+  { date: '2026-05-13', name: 'Russell Dickerson', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Niko Moon', ticketUrl: 'https://www.axs.com/events/1325131/russell-dickerson-tickets' },
+  { date: '2026-05-13', name: 'Snail Mail', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: 'Sharp Pins, Armlock', ticketUrl: 'https://www.axs.com/events/1290176/snail-mail-tickets' },
+  { date: '2026-05-13', name: 'Gelli Haha', venue: 'Lost Lake Lounge', genre: 'Pop', support: 'Big Sis', ticketUrl: 'https://www.etix.com/ticket/p/94964786/gelli-haha-wbig-sis-denver-lost-lake-lounge' },
+  { date: '2026-05-13', name: 'Good Kid', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: 'Inoha', ticketUrl: 'https://www.axs.com/events/1241063/good-kid-tickets' },
+  { date: '2026-05-13', name: 'Chet Faker', venue: 'Summit Music Hall', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.ticketmaster.com/chet-faker-denver-colorado-05-13-2026/event/1E006356D9B14D57' },
+  { date: '2026-05-14', name: 'Kevin Morby', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1241784/kevin-morby-tickets' },
+  { date: '2026-05-14', name: 'The Moss', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Gatlin', ticketUrl: 'https://www.axs.com/events/1157131/the-moss-tickets' },
+  { date: '2026-05-14', name: 'NewDad', venue: 'Bluebird Theater', genre: 'Rock', support: 'Freak Slug', ticketUrl: 'https://www.axs.com/events/1165987/newdad-tickets' },
+  { date: '2026-05-14', name: 'Yebba', venue: 'Summit Music Hall', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/yebba-denver-colorado-05-14-2026/event/1E006464B21FB30F' },
+  { date: '2026-05-14', name: 'Bottomland', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/82852108/bottomland-denver-lost-lake-lounge' },
+  { date: '2026-05-15', name: 'Moms Feelin\' Themselves', venue: 'Gothic Theatre', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1338196/moms-feelin-themselves-tickets' },
+  { date: '2026-05-15', name: 'Oranssi Pazuzu & Wayfarer', venue: 'Bluebird Theater', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1313815/oranssi-pazuzu-wayfarer-tickets' },
+  { date: '2026-05-15', name: 'Opiuo', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: 'Moontricks, TF Marz, McWavy', ticketUrl: 'https://www.axs.com/events/1289793/opiuo-tickets' },
+  { date: '2026-05-15', name: 'American Football & Mei Semones', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/american-football-with-mei-semones-denver-colorado-05-15-2026/event/1E00643E9DB1742E' },
+  { date: '2026-05-16', name: 'LSDream: Dreamrocks II', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Elohim, Steller, Seth David, Cam Steen', ticketUrl: 'https://www.axs.com/events/1247816/lsdream-dreamrocks-ii-tickets' },
+  { date: '2026-05-16', name: 'Grandaddy', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1313658/grandaddy-25th-anniversary-of-sophtware-slump-tickets' },
+  { date: '2026-05-16', name: 'WHIB', venue: 'Ogden Theatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1372735/2026-whib-1st-u-s-tour-go-up-our-era-in-denver-tickets' },
+  { date: '2026-05-16', name: 'Sqwerv', venue: 'Bluebird Theater', genre: 'Electronic/EDM', support: 'The Runaway Grooms', ticketUrl: 'https://www.axs.com/events/1330840/sqwerv-tickets' },
+  { date: '2026-05-16', name: 'Dance Hall Crashers & The Aquabats! & Five Iron Frenzy', venue: 'Mission Ballroom', genre: 'Punk', support: 'Potato Pirates', ticketUrl: 'https://www.axs.com/events/1303587/dance-hall-crashers-the-aquabats-five-iron-frenzy-tickets' },
+  { date: '2026-05-16', name: 'Blueface', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/blueface-denver-colorado-05-16-2026/event/1E006464EDAFF0A2' },
+  { date: '2026-05-16', name: 'Break Signals', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'Seven Teller (late set), Out Of Line Brass Band', ticketUrl: 'https://www.etix.com/ticket/p/60224746/break-signals-interstellar-transmission-album-release-party-wseven-teller-late-setout-of-line-brass-band-denver-lost-lake-lounge' },
+  { date: '2026-05-17', name: 'Coma Cinema', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Trace Mountains, Léna Bartels', ticketUrl: 'https://www.etix.com/ticket/p/44680152/coma-cinema-wtrace-mountains-lena-bartels-denver-lost-lake-lounge' },
+  { date: '2026-05-17', name: 'The Paper Kites', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: 'Donovan Woods', ticketUrl: 'https://www.axs.com/events/1154897/the-paper-kites-tickets' },
+  { date: '2026-05-17', name: 'Sports', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Ally Evenson', ticketUrl: 'https://www.axs.com/events/1171947/sports-tickets' },
+  { date: '2026-05-17', name: 'Baby Keem', venue: 'Fillmore Auditorium', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.ticketmaster.com/baby-keem-the-caino-tour-denver-colorado-05-17-2026/event/1E006444E2718F46' },
+  { date: '2026-05-18', name: 'Khalid', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: 'Lauv', ticketUrl: 'https://www.axs.com/events/1349032/khalid-tickets' },
+  { date: '2026-05-19', name: 'Kevin Gates', venue: 'Red Rocks Amphitheatre', genre: 'Hip-Hop/Rap', support: 'Shoreline Mafia, Ty Dolla $ign', ticketUrl: 'https://www.axs.com/events/1374032/kevin-gates-tickets' },
+  { date: '2026-05-19', name: 'Jensen McRae', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Jackie Evans', ticketUrl: 'https://www.axs.com/events/1273506/jensen-mcrae-god-has-a-hitman-tour-tickets' },
+  { date: '2026-05-19', name: 'Electric Six', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Tragedy: All Metal Tribute to the Bee Gees & Beyond', ticketUrl: 'https://www.axs.com/events/1135836/electric-six-tickets' },
+  { date: '2026-05-20', name: 'Smerz', venue: 'Gothic Theatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1255191/smerz-tickets' },
+  { date: '2026-05-20', name: 'Whitney', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1342748/whitney-tickets' },
+  { date: '2026-05-21', name: 'Sepultura', venue: 'Ogden Theatre', genre: 'Rock', support: 'Exodus, Biohazard, Tribal Gaze', ticketUrl: 'https://www.axs.com/events/1290780/sepultura-celebrating-life-through-death-tickets' },
+  { date: '2026-05-21', name: 'Ray Bull', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Babehoven', ticketUrl: 'https://www.axs.com/events/1328103/ray-bull-please-stop-laughing-tour-tickets' },
+  { date: '2026-05-21', name: 'flipturn', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'Richy Mitch & The Coal Miners', ticketUrl: '' },
+  { date: '2026-05-22', name: 'Seven Lions', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Mitis, Kill the Noise, HVDES', ticketUrl: 'https://www.axs.com/events/1165951/seven-lions-tickets' },
+  { date: '2026-05-22', name: 'Fai Laci', venue: 'Lost Lake Lounge', genre: 'Rock', support: '', ticketUrl: 'https://www.etix.com/ticket/p/51362741/fai-laci-denver-lost-lake-lounge' },
+  { date: '2026-05-22', name: 'Thy Art Is Murder', venue: 'Ogden Theatre', genre: 'Rock', support: 'Carnifex, Bodysnatcher, 200 Stab Wounds, Ingested, Gates To Hell, Bodybox', ticketUrl: 'https://www.axs.com/events/1259254/chaos-carnage-2026-w-thy-art-is-murder-tickets' },
+  { date: '2026-05-22', name: 'Gravagerz', venue: 'Bluebird Theater', genre: 'Electronic/EDM', support: 'Garret Dix, Planet Bloop, Mika Ohno', ticketUrl: 'https://www.axs.com/events/1294399/gravagerz-tickets' },
+  { date: '2026-05-22', name: 'Echo & The Bunnymen', venue: 'Mission Ballroom', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1180708/echo-the-bunnymen-tickets' },
+  { date: '2026-05-23', name: 'Fisher', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1234299/fisher-tickets' },
+  { date: '2026-05-23', name: 'Cradle of Filth', venue: 'Gothic Theatre', genre: 'Rock', support: 'Suffocation, Ghost Bath, Cultus Black', ticketUrl: 'https://www.axs.com/events/1252032/cradle-of-filth-tickets' },
+  { date: '2026-05-23', name: 'Space Wizard', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: 'Izzy Vadim, Rane b2b Stayns, Lozer, Organic Matter', ticketUrl: 'https://www.axs.com/events/1313874/space-wizard-tickets' },
+  { date: '2026-05-23', name: 'Keenan TreVon', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Kayla Rae, E.M.E, AC Yung', ticketUrl: 'https://www.axs.com/events/1295990/keenan-trevon-tickets' },
+  { date: '2026-05-23', name: 'Qveen Herby', venue: 'Mission Ballroom', genre: 'Hip-Hop/Rap', support: 'Thotsquad', ticketUrl: 'https://www.axs.com/events/1304801/qveen-herby-tickets' },
+  { date: '2026-05-23', name: 'Jaguar Sun & Kurt Travis', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/46207878/jaguar-sun-kurt-travis-denver-lost-lake-lounge' },
+  { date: '2026-05-24', name: 'Alabama Shakes', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'JJ Grey & Mofro', ticketUrl: 'https://www.axs.com/events/1247391/alabama-shakes-tickets' },
+  { date: '2026-05-24', name: 'Æthraxia', venue: 'Lost Lake Lounge', genre: 'Metal', support: 'Burning Through Darkness, Condemned To Burn, Angels In Electric Chairs', ticketUrl: 'https://www.etix.com/ticket/p/64196320/æthraxia-wburning-through-darknesscondemned-to-burn-angels-in-electric-chairs-denver-lost-lake-lounge' },
+  { date: '2026-05-25', name: 'Alabama Shakes', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'JJ Grey & Mofro', ticketUrl: 'https://www.axs.com/events/1247396/alabama-shakes-tickets' },
+  { date: '2026-05-25', name: 'Noise Resort', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'St. Range, Dante Must Die, Coda', ticketUrl: 'https://www.etix.com/ticket/p/88093538/noise-resort-wstrange-dante-must-die-coda-denver-lost-lake-lounge' },
+  { date: '2026-05-26', name: 'Stitched Up Heart', venue: 'The Roxy Theatre', genre: 'Metal', support: '', ticketUrl: 'https://www.bandsintown.com/e/107978308-stitched-up-heart-at-the-roxy-theater' },
+  { date: '2026-05-26', name: 'Thornhill', venue: 'Gothic Theatre', genre: 'Rock', support: '156/Silence, Fox Lake, Vianova', ticketUrl: 'https://www.axs.com/events/1257342/revolver-presents-thornhill-the-mercia-tour-tickets' },
+  { date: '2026-05-26', name: 'hemlocke springs', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'The Girl!', ticketUrl: 'https://www.axs.com/events/1329893/hemlocke-springs-tickets' },
+  { date: '2026-05-26', name: 'Deerhoof', venue: 'Lost Lake Lounge', genre: 'Rock', support: '', ticketUrl: 'https://www.etix.com/ticket/p/64637741/deerhoof-denver-lost-lake-lounge' },
+  { date: '2026-05-27', name: 'Santana', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1333318/santana-oneness-tour-2026-tickets' },
+  { date: '2026-05-27', name: 'Clara La San', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1333550/clara-la-san-tickets' },
+  { date: '2026-05-27', name: 'Swervedriver', venue: 'Bluebird Theater', genre: 'Rock', support: 'Broken Record', ticketUrl: 'https://www.axs.com/events/1221438/swervedriver-tickets' },
+  { date: '2026-05-27', name: 'VIAL', venue: 'Lost Lake Lounge', genre: 'Punk', support: 'Cowgirl Clue, Glass Eye', ticketUrl: 'https://www.etix.com/ticket/p/95247820/vial-wcowgirl-clueglass-eye-denver-lost-lake-lounge' },
+  { date: '2026-05-28', name: 'Santana', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1333321/santana-oneness-tour-2026-tickets' },
+  { date: '2026-05-28', name: 'Michael Franti', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1374027/an-acoustic-night-with-michael-franti-tickets' },
+  { date: '2026-05-28', name: 'Dead Tooth', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'The Foxhunt, Moon Pearl', ticketUrl: 'https://www.etix.com/ticket/p/46459714/dead-tooth-wthe-foxhuntmoon-pearl-denver-lost-lake-lounge' },
+  { date: '2026-05-29', name: 'Morgan Wallen', venue: 'Empower Field at Mile High', genre: 'Country', support: "I'm Still The Problem Tour", ticketUrl: 'https://www.ticketmaster.com/morgan-wallen-still-the-problem-tour-denver-colorado-05-29-2026/event/1E00635DF7CF9ADD' },
+  { date: '2026-05-29', name: 'Said the Sky', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1216453/said-the-sky-tickets' },
+  { date: '2026-05-29', name: 'Neoni', venue: 'Bluebird Theater', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1374024/neoni-tickets' },
+  { date: '2026-05-29', name: 'Michael Franti & Spearhead', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'The Original Wailers', ticketUrl: '' },
+  { date: '2026-05-29', name: 'Draag Me', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Peach Rings', ticketUrl: 'https://www.etix.com/ticket/p/67810261/draag-me-wpeach-rings-denver-lost-lake-lounge' },
+  { date: '2026-05-30', name: 'Alan Walker', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Audien', ticketUrl: 'https://www.axs.com/events/1223683/alan-walker-tickets' },
+  { date: '2026-05-30', name: 'Morgan Wallen', venue: 'Empower Field at Mile High', genre: 'Country', support: "I'm Still The Problem Tour", ticketUrl: 'https://www.ticketmaster.com/morgan-wallen-still-the-problem-tour-denver-colorado-05-30-2026/event/1E00635DF7D99AE8' },
+  { date: '2026-05-30', name: 'Wax Motif', venue: 'ReelWorks Denver', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/990241/wax-motif-tickets' },
+  { date: '2026-05-30', name: 'CRIMEWAVE', venue: 'Bluebird Theater', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1363975/crimewave-a-goth-post-punk-darkwave-party-tickets' },
+  { date: '2026-05-30', name: 'Clap Back', venue: 'Lost Lake Lounge', genre: 'Rock', support: 'The Babys, Grunge Barbie', ticketUrl: 'https://www.etix.com/ticket/p/44918671/clap-back-wthe-babysgrunge-barbie-denver-lost-lake-lounge' },
+  { date: '2026-05-31', name: 'KBong & Johnny Cosmic', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Tatanka', ticketUrl: 'https://www.axs.com/events/1340675/kbong-johnny-cosmic-tickets' },
+  { date: '2026-05-31', name: 'Palehound', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/31399764/palehound-denver-lost-lake-lounge' },
+  // ── JUNE ──
+  { date: '2026-06-01', name: 'Gully Boys', venue: 'Lost Lake Lounge', genre: 'Punk', support: 'Leggy, Cheap Perfume', ticketUrl: 'https://www.etix.com/ticket/p/49261571/gully-boys-wleggycheap-perfume-denver-lost-lake-lounge' },
+  { date: '2026-06-01', name: 'Kesha', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: 'Chromeo', ticketUrl: '' },
+  { date: '2026-06-02', name: 'The Last Dinner Party', venue: 'Mission Ballroom', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1329261/the-last-dinner-party-tickets' },
+  { date: '2026-06-02', name: 'GRAHAM', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Luke Rob', ticketUrl: 'https://www.axs.com/events/1355590/graham-tickets' },
+  { date: '2026-06-02', name: 'Alex Warren', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'Nat & Alex Wolff', ticketUrl: '' },
+  { date: '2026-06-03', name: 'Wale with Smino', venue: 'Mission Ballroom', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1382116/wale-with-smino-tickets' },
+  { date: '2026-06-04', name: 'Brit Floyd: The Wall', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1197429/brit-floyd-tickets' },
+  { date: '2026-06-05', name: 'Brit Floyd: Dark Side of the Moon', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1197454/brit-floyd-tickets' },
+  { date: '2026-06-05', name: 'Toadies', venue: 'Ogden Theatre', genre: 'Rock', support: 'Local H, Sparta', ticketUrl: 'https://www.axs.com/events/1330913/toadies-tickets' },
+  { date: '2026-06-06', name: 'Big Head Todd and the Monsters', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '4 Non Blondes', ticketUrl: 'https://www.axs.com/events/1354574/big-head-todd-and-the-monsters-tickets' },
+  { date: '2026-06-06', name: 'Josiah and the Bonnevilles', venue: 'Gothic Theatre', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1328060/josiah-and-the-bonnevilles-tickets' },
+  { date: '2026-06-06', name: 'Beats Antique', venue: 'Mission Ballroom', genre: 'Jam Band', support: 'Itchy-O, High Step Society, Carnivale de Senual', ticketUrl: 'https://www.axs.com/events/1287828/beats-antique-tickets' },
+  { date: '2026-06-07', name: 'Trey Anastasio', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: 'with the Colorado Symphony', ticketUrl: 'https://www.axs.com/events/1367681/trey-anastasio-tickets' },
+  { date: '2026-06-07', name: 'The Slackers', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Roka Hueka, The Alcapones', ticketUrl: 'https://www.axs.com/events/1329886/the-slackers-tickets' },
+  { date: '2026-06-08', name: 'Kittie', venue: 'Ogden Theatre', genre: 'Rock', support: 'Gore', ticketUrl: 'https://www.axs.com/events/1352796/kittie-tickets' },
+  { date: '2026-06-08', name: 'Frankie & The Witch Fingers', venue: 'Lost Lake Lounge', genre: 'Rock', support: '', ticketUrl: 'https://www.etix.com/ticket/p/80283766/frankie-the-witch-fingers-denver-lost-lake-lounge' },
+  { date: '2026-06-09', name: 'Jimmy Eat World', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Sunny Day Real Estate, The Get Up Kids', ticketUrl: 'https://www.axs.com/events/1256399/jimmy-eat-world-tickets' },
+  { date: '2026-06-09', name: 'Kings Kaleidoscope', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Hollyn', ticketUrl: 'https://www.axs.com/events/974348/kings-kaleidoscope-tickets' },
+  { date: '2026-06-10', name: 'Lord Huron', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1312474/lord-huron-tickets' },
+  { date: '2026-06-10', name: 'Witch Club Satan', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: 'Patriarchy', ticketUrl: 'https://www.axs.com/events/1304766/witch-club-satan-tickets' },
+  { date: '2026-06-11', name: 'Jon Bellion', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1317683/jon-bellion-tickets' },
+  { date: '2026-06-11', name: 'Haute & Freddy', venue: 'Bluebird Theater', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1345554/haute-freddy-tickets' },
+  { date: '2026-06-11', name: 'Rostam', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Henry Solomon', ticketUrl: 'https://www.axs.com/events/1357987/rostam-tickets' },
+  { date: '2026-06-11', name: 'Juvenile', venue: 'Ogden Theatre', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1290159/juvenile-s-boiling-point-album-release-tour-with-the-400-degreez-band-tickets' },
+  { date: '2026-06-11', name: 'Lord Huron', venue: "Fiddler's Green Amphitheatre", genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1253291/lord-huron-tickets' },
+  { date: '2026-06-11', name: 'Metric, Broken Social Scene, and Stars', venue: 'Fillmore Auditorium', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.ticketmaster.com/all-the-feelings-tour-with-metric-denver-colorado-06-11-2026/event/1E00643CD10B9AC7' },
+  { date: '2026-06-12', name: 'Paul Simon', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1318834/paul-simon-tickets' },
+  { date: '2026-06-12', name: 'Sully', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1313654/sully-tickets' },
+  { date: '2026-06-12', name: 'Pixel Grip', venue: 'ReelWorks Denver', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://ritualnoize.com/events/84206/orders/new' },
+  { date: '2026-06-13', name: 'Paul Simon', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1318841/paul-simon-tickets' },
+  { date: '2026-06-13', name: 'ZOA', venue: 'Bluebird Theater', genre: 'Electronic/EDM', support: 'Chocolate Drop, Spella, Exxotik', ticketUrl: 'https://www.axs.com/events/1376495/zoa-the-eras-within-tickets' },
+  { date: '2026-06-13', name: 'Lane 8', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1268431/lane-8-tickets' },
+  { date: '2026-06-13', name: 'Petey', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.etix.com/ticket/p/91723843/petey-denver-lost-lake-lounge' },
+  { date: '2026-06-14', name: 'Lenny Pearce', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'DJ Raphi', ticketUrl: '' },
+  { date: '2026-06-14', name: 'Trevor Hall & Thievery Corporation', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Dirtwire, Poranguí', ticketUrl: '' },
+  { date: '2026-06-15', name: 'Rod Stewart', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Richard Marx', ticketUrl: 'https://www.axs.com/events/1252699/rod-stewart-tickets' },
+  { date: '2026-06-16', name: 'Rod Stewart', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Richard Marx', ticketUrl: 'https://www.axs.com/events/1252714/rod-stewart-tickets' },
+  { date: '2026-06-16', name: 'Earl Sweatshirt with MIKE', venue: 'Mission Ballroom', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1382119/earl-sweatshirt-with-mike-tickets' },
+  { date: '2026-06-16', name: 'Tigers Jaw', venue: 'Bluebird Theater', genre: 'Rock', support: 'Pool Kids, Bleary Eyed', ticketUrl: 'https://www.axs.com/events/1281994/tigers-jaw-tickets' },
+  { date: '2026-06-17', name: 'Amyl & the Sniffers', venue: 'Red Rocks Amphitheatre', genre: 'Punk', support: 'L7, PARTY DOZEN', ticketUrl: 'https://www.axs.com/events/1341027/amyl-and-the-sniffers-tickets' },
+  { date: '2026-06-17', name: 'Amble', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1216102/amble-tickets' },
+  { date: '2026-06-18', name: 'Nitty Gritty Dirt Band', venue: 'Mission Ballroom', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1292722/nitty-gritty-dirt-band-tickets' },
+  { date: '2026-06-18', name: 'Third Day', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Michael W. Smith, Matt Maher, Brandon Heath, Jon Reddick', ticketUrl: '' },
+  { date: '2026-06-19', name: 'Louis Tomlinson', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: 'The Aces', ticketUrl: 'https://www.axs.com/events/1282565/louis-tomlinson-tickets' },
+  { date: '2026-06-19', name: 'Searows', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Mori', ticketUrl: 'https://www.axs.com/events/1267564/searows-tickets' },
+  { date: '2026-06-20', name: 'O.A.R.', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Gavin DeGraw, Phantom Planet', ticketUrl: 'https://www.axs.com/events/1251556/o-a-r-tickets' },
+  { date: '2026-06-20', name: 'The Dead South', venue: 'Mission Ballroom', genre: 'Country', support: 'Amigo The Devil', ticketUrl: 'https://www.axs.com/events/1234292/the-dead-south-tickets' },
+  { date: '2026-06-21', name: 'Holly Humberstone', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1318483/holly-humberstone-tickets' },
+  { date: '2026-06-22', name: 'Dance Gavin Dance', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/dance-gavin-dance-with-special-guests-denver-colorado-06-22-2026/event/1E00644CA9D3BBC4' },
+  { date: '2026-06-23', name: 'Weird Al Yankovic', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Puddles Pity Party', ticketUrl: '' },
+  { date: '2026-06-25', name: 'Pattie Gonia', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: 'Sequoia and VERA!', ticketUrl: 'https://www.axs.com/events/1253161/pattie-gonia-save-her-tickets' },
+  { date: '2026-06-25', name: 'Dirty Heads', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'honestav, Satsang', ticketUrl: '' },
+  { date: '2026-06-26', name: 'Widespread Panic', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1241762/widespread-panic-tickets' },
+  { date: '2026-06-26', name: 'Jessica Baio', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1297770/jessica-baio-tickets' },
+  { date: '2026-06-26', name: 'Connor Price & Nic D', venue: 'Mission Ballroom', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1332596/connor-price-nic-d-tickets' },
+  { date: '2026-06-27', name: 'Widespread Panic', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1241768/widespread-panic-tickets' },
+  { date: '2026-06-27', name: 'Low Cut Connie', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1351158/low-cut-connie-tickets' },
+  { date: '2026-06-27', name: 'Elderbrook', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: 'Tobiahs', ticketUrl: 'https://www.axs.com/events/1317864/elderbrook-tickets' },
+  { date: '2026-06-28', name: 'Widespread Panic', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1241771/widespread-panic-tickets' },
+  { date: '2026-06-29', name: 'AJR', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1327693/ajr-tickets' },
+  { date: '2026-06-30', name: 'AJR', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1327700/ajr-tickets' },
+  { date: '2026-06-30', name: 'Wolfmother', venue: 'Ogden Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1325126/wolfmother-tickets' },
+  // ── JULY ──
+  { date: '2026-07-01', name: 'Treaty Oak Revival', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'William Clark Green, Gannon Fremin', ticketUrl: 'https://www.axs.com/events/1363247/treaty-oak-revival-tickets' },
+  { date: '2026-07-01', name: 'Josh Groban', venue: 'Ball Arena', genre: 'Pop', support: 'Jennifer Hudson', ticketUrl: '' },
+  { date: '2026-07-02', name: 'Zeds Dead', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1162696/zeds-dead-tickets' },
+  { date: '2026-07-03', name: 'Zeds Dead', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1162698/zeds-dead-tickets' },
+  { date: '2026-07-04', name: 'Blues Traveler', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Better Than Ezra, The Record Company', ticketUrl: 'https://www.axs.com/events/1261610/blues-traveler-tickets' },
+  { date: '2026-07-04', name: 'Ed Sheeran', venue: 'Empower Field at Mile High', genre: 'Pop', support: '', ticketUrl: '' },
+  { date: '2026-07-05', name: 'Don Toliver', venue: 'Ball Arena', genre: 'Hip-Hop/Rap', support: '', ticketUrl: '' },
+  { date: '2026-07-10', name: 'The Avett Brothers', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'with the Lemonheads', ticketUrl: 'https://www.axs.com/events/1247800/the-avett-brothers-tickets' },
+  { date: '2026-07-10', name: 'Futurebirds', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1357059/futurebirds-tickets' },
+  { date: '2026-07-10', name: 'Artifakts', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1294406/artifakts-tickets' },
+  { date: '2026-07-11', name: 'The Avett Brothers', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'with Asleep at the Wheel', ticketUrl: 'https://www.axs.com/events/1247804/the-avett-brothers-tickets' },
+  { date: '2026-07-12', name: 'The Avett Brothers', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'with Graham Nash', ticketUrl: 'https://www.axs.com/events/1247807/the-avett-brothers-tickets' },
+  { date: '2026-07-13', name: 'Chance Peña', venue: 'Ogden Theatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1327703/chance-pena-tickets' },
+  { date: '2026-07-14', name: 'Kaleo', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Elle King', ticketUrl: 'https://www.axs.com/events/1247824/kaleo-tickets' },
+  { date: '2026-07-14', name: 'Chance Peña', venue: 'Ogden Theatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1327706/chance-pena-tickets' },
+  { date: '2026-07-15', name: 'The Head and the Heart', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'with Colorado Symphony, Evan Honer', ticketUrl: 'https://www.axs.com/events/1256363/the-head-and-the-heart-tickets' },
+  { date: '2026-07-16', name: 'The Head and the Heart', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'with Wilderado', ticketUrl: 'https://www.axs.com/events/1256380/the-head-and-the-heart-tickets' },
+  { date: '2026-07-16', name: 'Lee Brice', venue: 'Fillmore Auditorium', genre: 'Country', support: '', ticketUrl: 'https://www.ticketmaster.com/lee-brice-live-in-concert-denver-colorado-07-16-2026/event/1E00642DD8AAA01F' },
+  { date: '2026-07-17', name: 'The String Cheese Incident', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: 'Clay Street Unit', ticketUrl: 'https://www.axs.com/events/1271048/the-string-cheese-incident-tickets' },
+  { date: '2026-07-18', name: 'The String Cheese Incident', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1271051/the-string-cheese-incident-tickets' },
+  { date: '2026-07-19', name: 'Maren Morris', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'with Colorado Symphony', ticketUrl: 'https://www.axs.com/events/1354581/maren-morris-tickets' },
+  { date: '2026-07-20', name: 'BUNT.', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1360461/bunt-tickets' },
+  { date: '2026-07-20', name: 'Hilary Duff', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: 'La Roux, Jade LeMac', ticketUrl: '' },
+  { date: '2026-07-20', name: 'Forrest Frank', venue: 'Ball Arena', genre: 'Pop', support: '', ticketUrl: '' },
+  { date: '2026-07-22', name: 'Ella Mai', venue: "Fiddler's Green Amphitheatre", genre: 'Hip-Hop/Rap', support: 'AMA, Girlfriend', ticketUrl: 'https://www.axs.com/events/1365869/ella-mai-tickets' },
+  { date: '2026-07-23', name: 'Kim Gordon', venue: 'Ogden Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1363240/kim-gordon-tickets' },
+  { date: '2026-07-23', name: 'Old 97\'s', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1353052/old-97-s-tickets' },
+  { date: '2026-07-23', name: 'Joji', venue: 'Ball Arena', genre: 'Pop', support: '', ticketUrl: '' },
+  { date: '2026-07-24', name: 'of Montreal', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1332010/of-montreal-tickets' },
+  { date: '2026-07-24', name: 'Cross Canadian Ragweed', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'The Smokin Oaks, Waves in April', ticketUrl: '' },
+  { date: '2026-07-25', name: 'Rainbow Kitten Surprise', venue: "Fiddler's Green Amphitheatre", genre: 'Indie/Folk', support: 'Spacey Jane', ticketUrl: 'https://www.axs.com/events/1189481/rainbow-kitten-surprise-tickets' },
+  { date: '2026-07-25', name: 'Darius Rucker', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Old Crow Medicine Show, Austin Williams', ticketUrl: '' },
+  { date: '2026-07-25', name: 'Olivia Dean', venue: 'Ball Arena', genre: 'Pop', support: '', ticketUrl: '' },
+  { date: '2026-07-26', name: 'Olivia Dean', venue: 'Ball Arena', genre: 'Pop', support: '', ticketUrl: '' },
+  { date: '2026-07-28', name: 'AC/DC', venue: 'Empower Field at Mile High', genre: 'Rock', support: '', ticketUrl: '' },
+  { date: '2026-07-28', name: 'Sarah McLachlan', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Allison Russell', ticketUrl: '' },
+  { date: '2026-07-28', name: 'Megan Moroney', venue: 'Ball Arena', genre: 'Country', support: '', ticketUrl: '' },
+  { date: '2026-07-29', name: 'Parker McCollum', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1327689/parker-mccollum-tickets' },
+  { date: '2026-07-29', name: 'Poppy', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/poppy-constantly-nowhere-tour-denver-colorado-07-29-2026/event/1E00644CDD8D09A9' },
+  { date: '2026-07-30', name: 'Killer Queen', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: '' },
+  { date: '2026-07-30', name: 'CHIODOS', venue: 'Fillmore Auditorium', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/chiodos-its-not-you-its-me-denver-colorado-07-30-2026/event/1E00646C964B6FE3' },
+  { date: '2026-07-31', name: 'Tedeschi Trucks Band', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Lukas Nelson', ticketUrl: 'https://www.axs.com/events/1282557/tedeschi-trucks-band-tickets' },
+  { date: '2026-07-31', name: 'Excision', venue: "Fiddler's Green Amphitheatre", genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1289199/excision-tickets' },
+  { date: '2026-07-31', name: 'Lionel Richie', venue: 'Ball Arena', genre: 'Pop', support: 'Earth, Wind & Fire', ticketUrl: '' },
+  // ── AUGUST ──
+  { date: '2026-08-01', name: 'Tedeschi Trucks Band', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Lukas Nelson', ticketUrl: 'https://www.axs.com/events/1282562/tedeschi-trucks-band-tickets' },
+  { date: '2026-08-01', name: 'Excision', venue: "Fiddler's Green Amphitheatre", genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1320967/excision-tickets' },
+  { date: '2026-08-01', name: 'The Marcus King Band', venue: 'Mission Ballroom', genre: 'Jam Band', support: 'Penelope Road', ticketUrl: 'https://www.axs.com/events/1355456/the-marcus-king-band-tickets' },
+  { date: '2026-08-01', name: 'Meghan Trainor', venue: 'Ball Arena', genre: 'Pop', support: '', ticketUrl: '' },
+  { date: '2026-08-02', name: 'Wynonna & Melissa Etheridge', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'with the Colorado Symphony', ticketUrl: 'https://www.axs.com/events/1344267/wynonna-melissa-etheridge-tickets' },
+  { date: '2026-08-02', name: 'The Black Crowes & Whiskey Myers', venue: "Fiddler's Green Amphitheatre", genre: 'Rock', support: 'Southall', ticketUrl: 'https://www.axs.com/events/1307900/the-black-crowes-whiskey-myers-tickets' },
+  { date: '2026-08-04', name: 'Kingfishr', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1378826/kingfishr-tickets' },
+  { date: '2026-08-04', name: 'Audrey Hobert', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1289728/audrey-hobert-tickets' },
+  { date: '2026-08-04', name: 'Wunderhorse', venue: 'Bluebird Theater', genre: 'Rock', support: 'Fat, Evil Children', ticketUrl: 'https://www.axs.com/events/1367728/wunderhorse-tickets' },
+  { date: '2026-08-07', name: 'Tomahawk', venue: 'Ogden Theatre', genre: 'Rock', support: 'Melvins', ticketUrl: 'https://www.axs.com/events/1290183/tomahawk-tickets' },
+  { date: '2026-08-08', name: 'Slightly Stoopid', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'The Movement, Pepper', ticketUrl: '' },
+  { date: '2026-08-08', name: 'BOSCO', venue: 'Fillmore Auditorium', genre: 'Pop', support: '', ticketUrl: 'https://www.ticketmaster.com/the-marvelous-miss-gender-starring-bosco-denver-colorado-08-08-2026/event/1E006469C865C16F' },
+  { date: '2026-08-09', name: 'Motionless in White', venue: 'Red Rocks Amphitheatre', genre: 'Metal', support: 'Lorna Shore, Fit for a King, Static Dress', ticketUrl: 'https://www.axs.com/events/1317671/motionless-in-white-tickets' },
+  { date: '2026-08-09', name: 'Passion Pit', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1363230/passion-pit-tickets' },
+  { date: '2026-08-11', name: 'Empire of the Sun', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1367724/empire-of-the-sun-ask-that-god-afterlife-north-american-tour-tickets' },
+  { date: '2026-08-11', name: 'Dombresky & Walker & Royce', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1336376/dombresky-walker-royce-tickets' },
+  { date: '2026-08-12', name: 'The Guess Who', venue: "Fiddler's Green Amphitheatre", genre: 'Rock', support: 'Don Felder', ticketUrl: 'https://www.axs.com/events/1308356/the-guess-who-tickets' },
+  { date: '2026-08-13', name: 'Zach Bryan', venue: 'Empower Field at Mile High', genre: 'Country', support: '', ticketUrl: '' },
+  { date: '2026-08-13', name: 'Mt. Joy', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'Leif Vollebekk, Arcy Drive', ticketUrl: 'https://www.axs.com/events/1232801/mt-joy-tickets' },
+  { date: '2026-08-14', name: 'Zach Bryan', venue: 'Empower Field at Mile High', genre: 'Country', support: '', ticketUrl: '' },
+  { date: '2026-08-14', name: 'Mt. Joy', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'Leif Vollebekk, Arcy Drive', ticketUrl: 'https://www.axs.com/events/1232806/mt-joy-tickets' },
+  { date: '2026-08-15', name: 'Mt. Joy', venue: "Fiddler's Green Amphitheatre", genre: 'Indie/Folk', support: 'Arcy Drive', ticketUrl: 'https://www.axs.com/events/1231783/mt-joy-tickets' },
+  { date: '2026-08-15', name: 'Die Spitz', venue: 'Gothic Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1342101/die-spitz-tickets' },
+  { date: '2026-08-17', name: 'Train', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Barenaked Ladies, Matt Nathanson', ticketUrl: 'https://www.axs.com/events/1216432/train-drops-of-jupiter-25-years-in-the-atmosphere-tickets' },
+  { date: '2026-08-20', name: 'Tori Amos', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1327709/tori-amos-tickets' },
+  { date: '2026-08-20', name: 'Sugar', venue: 'Mission Ballroom', genre: 'Jam Band', support: 'J. Robbins (Jawbox)', ticketUrl: 'https://www.axs.com/events/1303163/sugar-tickets' },
+  { date: '2026-08-21', name: 'Starjunk 95', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1350100/starjunk-95-tickets' },
+  { date: '2026-08-21', name: 'Dead on a Sunday', venue: 'Bluebird Theater', genre: 'Rock', support: 'NITE, The System Dreams of You', ticketUrl: 'https://www.axs.com/events/1348067/dead-on-a-sunday-tickets' },
+  { date: '2026-08-21', name: 'CAAMP', venue: "Fiddler's Green Amphitheatre", genre: 'Indie/Folk', support: 'Durand Jones & The Indications', ticketUrl: 'https://www.axs.com/events/1313876/caamp-tickets' },
+  { date: '2026-08-21', name: 'Joe Russo\'s Almost Dead', venue: 'Mission Ballroom', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1317758/joe-russos-almost-dead-tickets' },
+  { date: '2026-08-21', name: 'J. Cole', venue: 'Ball Arena', genre: 'Hip-Hop/Rap', support: '', ticketUrl: '' },
+  { date: '2026-08-22', name: 'Steam Powered Giraffe', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1332678/steam-powered-giraffe-tickets' },
+  { date: '2026-08-22', name: 'Ray Wylie Hubbard', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1321056/ray-wylie-hubbard-tickets' },
+  { date: '2026-08-22', name: 'CAAMP', venue: "Fiddler's Green Amphitheatre", genre: 'Indie/Folk', support: 'Durand Jones & The Indications', ticketUrl: 'https://www.axs.com/events/1329890/caamp-tickets' },
+  { date: '2026-08-22', name: 'Courtney Barnett', venue: 'Mission Ballroom', genre: 'Indie/Folk', support: 'Zoh Amba', ticketUrl: 'https://www.axs.com/events/1273331/courtney-barnett-tickets' },
+  { date: '2026-08-22', name: 'TOTO', venue: 'Ball Arena', genre: 'Rock', support: 'Christopher Cross, The Romantics', ticketUrl: '' },
+  { date: '2026-08-23', name: 'Joe Bonamassa', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: '' },
+  { date: '2026-08-23', name: 'Avenged Sevenfold', venue: 'Ball Arena', genre: 'Metal', support: 'Good Charlotte', ticketUrl: '' },
+  { date: '2026-08-25', name: 'Ian Munsick', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1327717/ian-munsick-tickets' },
+  { date: '2026-08-26', name: 'Ray LaMontagne', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1232813/ray-lamontagne-tickets' },
+  { date: '2026-08-26', name: 'Fink', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1363602/fink-tickets' },
+  { date: '2026-08-27', name: 'Goose', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1280854/goose-tickets' },
+  { date: '2026-08-28', name: 'Dave Matthews Band', venue: "Fiddler's Green Amphitheatre", genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1261703/dave-matthews-band-tickets' },
+  { date: '2026-08-28', name: 'Goose', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: '' },
+  { date: '2026-08-28', name: 'Chicago', venue: 'Ball Arena', genre: 'Rock', support: 'Styx', ticketUrl: '' },
+  { date: '2026-08-29', name: 'Dave Matthews Band', venue: "Fiddler's Green Amphitheatre", genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1308244/dave-matthews-band-tickets' },
+  // ── SEPTEMBER ──
+  { date: '2026-09-02', name: 'Jack Johnson', venue: "Fiddler's Green Amphitheatre", genre: 'Indie/Folk', support: 'Lake Street Dive', ticketUrl: 'https://www.axs.com/events/1174904/jack-johnson-tickets' },
+  { date: '2026-09-03', name: 'Jack Johnson', venue: "Fiddler's Green Amphitheatre", genre: 'Indie/Folk', support: 'Lake Street Dive', ticketUrl: 'https://www.axs.com/events/1213698/jack-johnson-tickets' },
+  { date: '2026-09-06', name: 'Gregory Alan Isakov', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: '', ticketUrl: '' },
+  { date: '2026-09-07', name: 'Gregory Alan Isakov', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: '', ticketUrl: '' },
+  { date: '2026-09-08', name: 'Five Finger Death Punch', venue: 'Red Rocks Amphitheatre', genre: 'Metal', support: 'Cody Jinks, Eva Under Fire', ticketUrl: '' },
+  { date: '2026-09-09', name: 'Cole Swindell', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'BlackHawk, Zach John King', ticketUrl: '' },
+  { date: '2026-09-11', name: 'Brandi Carlile', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'The Human Tour', ticketUrl: 'https://www.axs.com/events/1322756/brandi-carlile-tickets' },
+  { date: '2026-09-11', name: 'Tame Impala', venue: 'Ball Arena', genre: 'Indie/Folk', support: '', ticketUrl: '' },
+  { date: '2026-09-12', name: 'Brandi Carlile', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'The Human Tour', ticketUrl: 'https://www.axs.com/events/1322758/brandi-carlile-tickets' },
+  { date: '2026-09-12', name: 'Rob Zombie & Marilyn Manson', venue: "Fiddler's Green Amphitheatre", genre: 'Metal', support: 'The HU, Orgy', ticketUrl: 'https://www.axs.com/events/1289187/rob-zombie-marilyn-manson-tickets' },
+  { date: '2026-09-13', name: 'Brandi Carlile', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: 'The Human Tour', ticketUrl: 'https://www.axs.com/events/1322764/brandi-carlile-tickets' },
+  { date: '2026-09-14', name: 'NEEDTOBREATHE', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1344272/needtobreathe-tickets' },
+  { date: '2026-09-14', name: 'Peter Hook & The Light', venue: 'Ogden Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1098027/peter-hook-the-light-tickets' },
+  { date: '2026-09-16', name: 'EIHWAR', venue: 'Bluebird Theater', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1372722/eihwar-tickets' },
+  { date: '2026-09-17', name: 'Tab Benoit', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Zac Schulze Gang', ticketUrl: 'https://www.axs.com/events/1331781/tab-benoit-tickets' },
+  { date: '2026-09-17', name: 'Get The Led Out', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: '', ticketUrl: '' },
+  { date: '2026-09-21', name: 'Aldous Harding', venue: 'Bluebird Theater', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1265730/aldous-harding-tickets' },
+  { date: '2026-09-22', name: 'Dillstradamus (Dillon Francis b2b Flosstradamus)', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1289469/dillstradamus-dillon-francis-b2b-flosstradamus-tickets' },
+  { date: '2026-09-23', name: 'Bleachers', venue: 'Red Rocks Amphitheatre', genre: 'Pop', support: '', ticketUrl: 'https://www.axs.com/events/1354577/bleachers-tickets' },
+  { date: '2026-09-24', name: 'Hiss Golden Messenger', venue: 'Ogden Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1327383/hiss-golden-messenger-tickets' },
+  { date: '2026-09-24', name: 'Social Distortion', venue: 'Mission Ballroom', genre: 'Rock', support: 'Descendents, The Chats', ticketUrl: 'https://www.axs.com/events/1342097/social-distortion-tickets' },
+  { date: '2026-09-25', name: 'Ivy Lab', venue: 'Ogden Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1357684/ivy-lab-tickets' },
+  { date: '2026-09-25', name: 'The Revivalists', venue: 'Red Rocks Amphitheatre', genre: 'Jam Band', support: 'Ax and the Hatchetmen', ticketUrl: '' },
+  { date: '2026-09-26', name: 'Big Gigantic: Rowdytown 14', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1286453/big-gigantic-rowdytown-14-tickets' },
+  { date: '2026-09-26', name: 'Arlo Parks', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1357375/arlo-parks-tickets' },
+  { date: '2026-09-26', name: 'Deer Tick', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1357985/deer-tick-tickets' },
+  { date: '2026-09-26', name: 'Four Tet', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1374093/four-tet-tickets' },
+  { date: '2026-09-26', name: 'Yacht Rock Revue', venue: 'Mission Ballroom', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1311854/yacht-rock-revue-tickets' },
+  { date: '2026-09-28', name: 'Breaking Benjamin', venue: 'Ball Arena', genre: 'Rock', support: '', ticketUrl: '' },
+  // ── OCTOBER ──
+  { date: '2026-10-02', name: 'Roger Clyne & The Peacemakers', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1338340/roger-clyne-the-peacemakers-tickets' },
+  { date: '2026-10-03', name: 'Rezz Rocks VIII', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Frost Children, Kavari, Izzy Camina', ticketUrl: 'https://www.axs.com/events/1241785/rezz-rocks-viii-tickets' },
+  { date: '2026-10-05', name: 'RUSH', venue: 'Ball Arena', genre: 'Rock', support: '', ticketUrl: '' },
+  { date: '2026-10-06', name: 'Big Thief', venue: 'Red Rocks Amphitheatre', genre: 'Indie/Folk', support: '', ticketUrl: '' },
+  { date: '2026-10-07', name: 'RUSH', venue: 'Ball Arena', genre: 'Rock', support: '', ticketUrl: '' },
+  { date: '2026-10-08', name: 'Tape B', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1317667/tape-b-tickets' },
+  { date: '2026-10-08', name: 'Iron & Wine', venue: 'Ogden Theatre', genre: 'Rock', support: 'Ken Pomeroy', ticketUrl: 'https://www.axs.com/events/1317666/iron-wine-tickets' },
+  { date: '2026-10-08', name: 'Doja Cat', venue: 'Ball Arena', genre: 'Hip-Hop/Rap', support: '', ticketUrl: '' },
+  { date: '2026-10-09', name: 'Tape B', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1345539/tape-b-tickets' },
+  { date: '2026-10-09', name: 'Sex Pistols ft. Frank Carter', venue: 'Ogden Theatre', genre: 'Punk', support: '', ticketUrl: 'https://www.axs.com/events/1379666/sex-pistols-ft-frank-carter-tickets' },
+  { date: '2026-10-10', name: 'Snarky Puppy', venue: 'Mission Ballroom', genre: 'Jam Band', support: '', ticketUrl: 'https://www.axs.com/events/1313399/snarky-puppy-tickets' },
+  { date: '2026-10-11', name: 'Osees', venue: 'Ogden Theatre', genre: 'Rock', support: 'Traps PS', ticketUrl: 'https://www.axs.com/events/1363227/osees-tickets' },
+  { date: '2026-10-12', name: 'Rise Against', venue: 'Red Rocks Amphitheatre', genre: 'Punk', support: 'Alkaline Trio', ticketUrl: 'https://www.axs.com/events/1344278/rise-against-tickets' },
+  { date: '2026-10-16', name: 'Sammy Virji', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'Confidence Man, Oppidan, Sam Alfred', ticketUrl: '' },
+  { date: '2026-10-18', name: 'Gorillaz', venue: 'Ball Arena', genre: 'Rock', support: 'Little Simz, Deltron 3030', ticketUrl: '' },
+  { date: '2026-10-19', name: 'Zac Brown Band', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Grace Potter', ticketUrl: 'https://www.axs.com/events/1297709/zac-brown-band-tickets' },
+  { date: '2026-10-20', name: 'Zac Brown Band', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Grace Potter', ticketUrl: 'https://www.axs.com/events/1297713/zac-brown-band-tickets' },
+  { date: '2026-10-23', name: 'Mersiv', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1350102/mersiv-tickets' },
+  { date: '2026-10-23', name: 'Odd Mob', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1355568/odd-mob-tickets' },
+  { date: '2026-10-26', name: 'Evanescence K. Flay', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: '', ticketUrl: '' },
+  { date: '2026-10-27', name: 'Tucker Wetmore', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: '', ticketUrl: 'https://www.axs.com/events/1379668/tucker-wetmore-tickets' },
+  { date: '2026-10-28', name: 'Koe Wetzel', venue: 'Red Rocks Amphitheatre', genre: 'Country', support: 'Wade Bowen, Kolby Cooper', ticketUrl: 'https://www.axs.com/events/1328896/koe-wetzel-tickets' },
+  { date: '2026-10-28', name: 'Evanescence', venue: 'Red Rocks Amphitheatre', genre: 'Rock', support: 'Spiritbox, Nova Twins', ticketUrl: 'https://www.axs.com/events/1363243/evanescence-tickets' },
+  { date: '2026-10-29', name: 'Cypress Hill: Haunted Rocks', venue: 'Red Rocks Amphitheatre', genre: 'Hip-Hop/Rap', support: 'Method Man & Redman, De La Soul, Digable Planets', ticketUrl: 'https://www.axs.com/events/1271062/cypress-hill-tickets' },
+  { date: '2026-10-30', name: 'Matroda', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: '', ticketUrl: 'https://www.axs.com/events/1273333/matroda-tickets' },
+  // ── NOVEMBER ──
+  { date: '2026-11-07', name: 'Tank and The Bangas', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: 'Ariel J.', ticketUrl: 'https://www.axs.com/events/1377574/tank-and-the-bangas-tickets' },
+  { date: '2026-11-11', name: 'Three Days Grace', venue: 'Ball Arena', genre: 'Rock', support: '', ticketUrl: '' },
+  { date: '2026-11-13', name: 'Bahamas', venue: 'Bluebird Theater', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1355585/bahamas-tickets' },
+  { date: '2026-11-14', name: 'Mike', venue: 'Red Rocks Amphitheatre', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1363234/mike-tickets' },
+  { date: '2026-11-15', name: 'Mike', venue: 'Red Rocks Amphitheatre', genre: 'Hip-Hop/Rap', support: '', ticketUrl: 'https://www.axs.com/events/1363237/mike-tickets' },
+  { date: '2026-11-15', name: 'The Living Tombstone', venue: 'Mission Ballroom', genre: 'Punk', support: '', ticketUrl: 'https://www.axs.com/events/1378832/the-living-tombstone-tickets' },
+  { date: '2026-11-21', name: 'Foy Vance', venue: 'Gothic Theatre', genre: 'Indie/Folk', support: '', ticketUrl: 'https://www.axs.com/events/1329843/foy-vance-tickets' },
+  // ── FEBRUARY ──
+  { date: '2027-02-18', name: 'Public Image Ltd', venue: 'Gothic Theatre', genre: 'Rock', support: '', ticketUrl: 'https://www.axs.com/events/1363608/public-image-ltd-tickets' },
+];
+
+const GENRE_CLASS = {
+  'Hip-Hop/Rap':    'genre-hiphop',
+  'Electronic/EDM': 'genre-electronic',
+  'Rock':           'genre-rock',
+  'Country':        'genre-country',
+  'Pop':            'genre-pop',
+  'Indie/Folk':     'genre-indie',
+  'Punk':           'genre-punk',
+  'Jam Band':       'genre-jam',
+  'Metal':          'genre-metal',
+};
+
+const GENRE_COLOR = {
+  'Hip-Hop/Rap':    '#9c27b0',
+  'Electronic/EDM': '#0288d1',
+  'Rock':           '#e64a19',
+  'Country':        '#f9a825',
+  'Pop':            '#e91e63',
+  'Indie/Folk':     '#00897b',
+  'Punk':           '#c62828',
+  'Jam Band':       '#388e3c',
+  'Metal':          '#424242',
+};
+
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+
+// State
+let currentMonth = 2; // March = index 2 (0-based)
+let currentYear  = 2026;
+let filteredConcerts = [...CONCERTS];
+
+const ALL_VENUES = [...new Set(CONCERTS.map(c => c.venue))].sort();
+const ALL_GENRES = [...new Set(CONCERTS.map(c => c.genre))].sort();
+let selectedVenues = new Set(ALL_VENUES);
+let selectedGenres = new Set(ALL_GENRES);
+
+// ── FILTER CHIPS ──────────────────────────────
+function renderFilterChips() {
+  // Venue chips
+  const vc = document.getElementById('venueChips');
+  const allVenuesOn = selectedVenues.size === ALL_VENUES.length;
+  let vhtml = '<div class="filter-chip select-all' + (allVenuesOn ? ' active' : '') +
+    '" onclick="toggleAllVenues()">All</div>';
+  ALL_VENUES.forEach(function(v) {
+    vhtml += '<div class="filter-chip' + (selectedVenues.has(v) ? ' active' : '') +
+      '" onclick="toggleVenue(\'' + v.replace(/'/g, "\\'") + '\')">' + v + '</div>';
+  });
+  vc.innerHTML = vhtml;
+
+  // Genre chips
+  const gc = document.getElementById('genreChips');
+  const allGenresOn = selectedGenres.size === ALL_GENRES.length;
+  let ghtml = '<div class="filter-chip select-all' + (allGenresOn ? ' active' : '') +
+    '" onclick="toggleAllGenres()">All</div>';
+  ALL_GENRES.forEach(function(g) {
+    ghtml += '<div class="filter-chip' + (selectedGenres.has(g) ? ' active' : '') +
+      '" onclick="toggleGenre(\'' + g.replace(/'/g, "\\'") + '\')">' + g + '</div>';
+  });
+  gc.innerHTML = ghtml;
+}
+
+function toggleVenue(v) {
+  if (selectedVenues.has(v)) selectedVenues.delete(v);
+  else selectedVenues.add(v);
+  renderFilterChips();
+  applyFilters();
+}
+
+function toggleGenre(g) {
+  if (selectedGenres.has(g)) selectedGenres.delete(g);
+  else selectedGenres.add(g);
+  renderFilterChips();
+  applyFilters();
+}
+
+function toggleAllVenues() {
+  if (selectedVenues.size === ALL_VENUES.length) selectedVenues.clear();
+  else selectedVenues = new Set(ALL_VENUES);
+  renderFilterChips();
+  applyFilters();
+}
+
+function toggleAllGenres() {
+  if (selectedGenres.size === ALL_GENRES.length) selectedGenres.clear();
+  else selectedGenres = new Set(ALL_GENRES);
+  renderFilterChips();
+  applyFilters();
+}
+
+// ── FILTER ─────────────────────────────────────
+function applyFilters() {
+  filteredConcerts = CONCERTS.filter(c => {
+    return selectedVenues.has(c.venue) && selectedGenres.has(c.genre);
+  });
+  document.getElementById('resultCount').innerHTML =
+    '<span>' + filteredConcerts.length + '</span> shows';
+  renderCalendar();
+}
+
+// ── CALENDAR ───────────────────────────────────
+function renderCalendar() {
+  document.getElementById('monthLabel').textContent =
+    MONTHS[currentMonth] + ' ' + currentYear;
+
+  const grid = document.getElementById('calGrid');
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' +
+    String(today.getMonth()+1).padStart(2,'0') + '-' +
+    String(today.getDate()).padStart(2,'0');
+
+  let html = '';
+
+  // Leading empty cells
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = currentYear + '-' +
+      String(currentMonth+1).padStart(2,'0') + '-' +
+      String(day).padStart(2,'0');
+    const dayEvents = filteredConcerts.filter(c => c.date === dateStr);
+    const isToday   = dateStr === todayStr;
+    const hasEvents = dayEvents.length > 0;
+
+    let chips = '';
+    const maxVisible = 6;
+    dayEvents.slice(0, maxVisible).forEach(function(ev) {
+      const cls = GENRE_CLASS[ev.genre] || 'genre-rock';
+      chips += '<div class="event-chip ' + cls + '">' + ev.name + '</div>';
+    });
+    if (dayEvents.length > maxVisible) {
+      chips += '<div class="more-events">see ' + (dayEvents.length - maxVisible) + ' more</div>';
+    }
+
+    html += '<div class="cal-cell' +
+      (hasEvents ? ' has-events' : '') +
+      (isToday   ? ' today'     : '') + '"' +
+      (hasEvents ? ' onclick="openModal(\'' + dateStr + '\')"' : '') + '>' +
+      '<div class="day-num">' + day + '</div>' +
+      chips +
+      '</div>';
+  }
+
+  grid.innerHTML = html;
+  renderMonthDots();
+}
+
+// ── MONTH DOTS ─────────────────────────────────
+function renderMonthDots() {
+  let html = '';
+  for (let m = 0; m < 12; m++) {
+    const hasEvents = filteredConcerts.some(function(c) {
+      const d = new Date(c.date);
+      return d.getMonth() === m && d.getFullYear() === currentYear;
+    });
+    html += '<div class="month-dot' +
+      (m === currentMonth ? ' active' : '') +
+      (hasEvents ? ' has-events' : '') + '"' +
+      ' title="' + MONTHS[m] + '"' +
+      ' onclick="goToMonth(' + m + ')"></div>';
+  }
+  document.getElementById('monthDots').innerHTML = html;
+}
+
+function goToMonth(m)  { currentMonth = m; renderCalendar(); }
+function prevMonth()   { if (currentMonth > 0)  { currentMonth--; renderCalendar(); } }
+function nextMonth()   { if (currentMonth < 11) { currentMonth++; renderCalendar(); } }
+
+// ── MODAL ──────────────────────────────────────
+function openModal(dateStr) {
+  const dayEvents = filteredConcerts.filter(c => c.date === dateStr);
+  if (!dayEvents.length) return;
+
+  const parts = dateStr.split('-').map(Number);
+  const dateObj = new Date(parts[0], parts[1]-1, parts[2]);
+  const formatted = dateObj.toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+  });
+  document.getElementById('modalDate').textContent = formatted;
+
+  let body = '';
+  dayEvents.forEach(function(ev) {
+    const cls = GENRE_CLASS[ev.genre] || 'genre-rock';
+    var ticketHtml = ev.ticketUrl
+      ? '<a class="ticket-btn" href="' + ev.ticketUrl + '" target="_blank" rel="noopener">' +
+        '<svg viewBox="0 0 24 24"><path d="M22 10V6a2 2 0 00-2-2H4a2 2 0 00-2 2v4a2 2 0 010 4v4a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 010-4zm-2-1.46a4 4 0 000 6.92V18H4v-2.54a4 4 0 000-6.92V6h16v2.54z"/></svg>' +
+        'Buy Tickets</a>' : '';
+    body += '<div class="modal-event ' + cls + '">' +
+      '<div class="modal-event-name">' + ev.name + '</div>' +
+      '<div class="modal-event-meta">' +
+      '<span class="meta-tag">&#128205; ' + ev.venue + '</span>' +
+      '<span class="meta-tag">&#127926; ' + ev.genre + '</span>' +
+      (ev.support ? '<span class="meta-tag">w/ ' + ev.support + '</span>' : '') +
+      '</div>' + ticketHtml + '</div>';
+  });
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal()        { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOutside(e){ if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+// ── LEGEND ─────────────────────────────────────
+function renderLegend() {
+  const genres = [...new Set(CONCERTS.map(c => c.genre))].sort();
+  document.getElementById('legend').innerHTML = genres.map(function(g) {
+    const cls = GENRE_CLASS[g] || 'genre-rock';
+    return '<div class="legend-item" onclick="filterByGenre(\'' + g + '\')">' +
+      '<div class="legend-swatch ' + cls + '"></div>' +
+      g + '</div>';
+  }).join('');
+}
+
+function filterByGenre(g) {
+  toggleGenre(g);
+}
+
+// ── ARTIST SEARCH ─────────────────────────────
+(function() {
+  const input = document.getElementById('artistSearch');
+  const dropdown = document.getElementById('searchDropdown');
+  let highlightIdx = -1;
+  let currentMatches = [];
+
+  // Build unique artist list with their dates
+  function getMatches(query) {
+    if (!query || query.length < 2) return [];
+    const q = query.toLowerCase();
+    const seen = new Set();
+    const results = [];
+    CONCERTS.forEach(function(c) {
+      if (c.name.toLowerCase().includes(q)) {
+        const key = c.name.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          results.push({ name: c.name });
+        }
+      }
+    });
+    return results.slice(0, 10);
+  }
+
+  function renderDropdown() {
+    if (!currentMatches.length) {
+      dropdown.classList.remove('open');
+      return;
+    }
+    dropdown.innerHTML = currentMatches.map(function(m, i) {
+      return '<div class="search-item' + (i === highlightIdx ? ' highlighted' : '') +
+        '" data-idx="' + i + '">' + m.name + '</div>';
+    }).join('');
+    dropdown.classList.add('open');
+  }
+
+  function selectArtist(name) {
+    // Find all concerts for this artist and open the modal for the first matching date
+    const matches = CONCERTS.filter(function(c) {
+      return c.name.toLowerCase() === name.toLowerCase();
+    });
+    if (!matches.length) return;
+
+    // Navigate to that month and open the day modal
+    const parts = matches[0].date.split('-').map(Number);
+    currentMonth = parts[1] - 1;
+    currentYear = parts[0];
+    renderCalendar();
+    openModal(matches[0].date);
+
+    // Clear search
+    input.value = '';
+    dropdown.classList.remove('open');
+    currentMatches = [];
+    highlightIdx = -1;
+  }
+
+  input.addEventListener('input', function() {
+    highlightIdx = -1;
+    currentMatches = getMatches(input.value.trim());
+    renderDropdown();
+  });
+
+  input.addEventListener('keydown', function(e) {
+    if (!currentMatches.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlightIdx = Math.min(highlightIdx + 1, currentMatches.length - 1);
+      renderDropdown();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlightIdx = Math.max(highlightIdx - 1, 0);
+      renderDropdown();
+    } else if (e.key === 'Enter' && highlightIdx >= 0) {
+      e.preventDefault();
+      selectArtist(currentMatches[highlightIdx].name);
+    } else if (e.key === 'Escape') {
+      dropdown.classList.remove('open');
+      input.blur();
+    }
+  });
+
+  dropdown.addEventListener('click', function(e) {
+    const item = e.target.closest('.search-item');
+    if (!item) return;
+    const idx = parseInt(item.dataset.idx);
+    selectArtist(currentMatches[idx].name);
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-wrap')) {
+      dropdown.classList.remove('open');
+    }
+  });
+})();
+
+// ── KEYBOARD ───────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  // Don't trigger nav keys when search input is focused
+  if (document.activeElement === document.getElementById('artistSearch')) return;
+  if (e.key === 'Escape')      closeModal();
+  if (e.key === 'ArrowLeft')   prevMonth();
+  if (e.key === 'ArrowRight')  nextMonth();
+});
+
+// ── INIT ───────────────────────────────────────
+renderFilterChips();
+renderLegend();
+applyFilters();
+</script>
+</body>
+</html>
