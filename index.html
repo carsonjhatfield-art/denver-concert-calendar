@@ -1290,7 +1290,7 @@ function renderCalendar() {
     }
 
     var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var dowLabel = dayNames[new Date(year, month, day).getDay()];
+    var dowLabel = dayNames[new Date(currentYear, currentMonth, day).getDay()];
     html += '<div class="cal-cell' +
       (hasEvents ? ' has-events' : '') +
       (isToday   ? ' today'     : '') + '"' +
