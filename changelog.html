@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Denver Concert Calendar — Change Log</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px; max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 6px; color: #f8fafc; }
+  .subtitle { color: #94a3b8; margin-bottom: 24px; font-size: 0.9rem; }
+  .subtitle a { color: #60a5fa; text-decoration: none; }
+  .subtitle a:hover { text-decoration: underline; }
+  .venue-section { margin-bottom: 32px; }
+  .venue-header { font-size: 1.15rem; color: #38bdf8; border-bottom: 1px solid #1e293b; padding-bottom: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: baseline; }
+  .venue-header .count { font-size: 0.8rem; color: #64748b; font-weight: normal; }
+  .change-entry { background: #1e293b; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; display: flex; gap: 16px; align-items: baseline; }
+  .change-date { color: #94a3b8; font-size: 0.8rem; white-space: nowrap; min-width: 90px; }
+  .change-type { font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+  .change-type.added { background: #065f46; color: #6ee7b7; }
+  .change-type.updated { background: #713f12; color: #fcd34d; }
+  .change-type.removed { background: #7f1d1d; color: #fca5a5; }
+  .change-detail { flex: 1; }
+  .change-artist { font-weight: 600; color: #f1f5f9; }
+  .change-meta { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+  .scrape-stamp { font-size: 0.75rem; color: #475569; text-align: right; margin-top: 4px; }
+  .empty-state { color: #475569; font-style: italic; padding: 24px; text-align: center; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-chip { background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 20px; padding: 4px 14px; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; }
+  .filter-chip:hover { border-color: #60a5fa; color: #e2e8f0; }
+  .filter-chip.active { background: #1e3a5f; border-color: #60a5fa; color: #60a5fa; }
+</style>
+</head>
+<body>
+
+<h1>Denver Concert Calendar — Change Log</h1>
+<p class="subtitle">Tracking additions and updates from venue scrapes. <a href="index.html">Back to calendar</a></p>
+
+<div class="filter-bar" id="filterBar"></div>
+
+<div id="changelogContent">
+  <p class="empty-state">No changes recorded yet. Changes will appear here after the first scheduled scrape.</p>
+</div>
+
+<script>
+// CHANGELOG_DATA is an array of objects:
+// { date: 'YYYY-MM-DD', type: 'added'|'updated'|'removed', venue: 'Venue Name', artist: 'Artist Name', concertDate: 'YYYY-MM-DD', detail: 'optional detail text', scrapeDate: 'YYYY-MM-DD' }
+const CHANGELOG_DATA = [
+  { type: 'added', venue: 'Mission Ballroom', artist: 'GOV\'T MULE', concertDate: '2026-03-27', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Gothic Theatre', artist: 'Ravenscoon & Jantsen', concertDate: '2026-03-28', detail: 'Support: Foxx', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Trauma Ray', concertDate: '2026-04-02', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Velvet Collective', concertDate: '2026-04-03', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Night Mullet', concertDate: '2026-04-04', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Soft Fangs', concertDate: '2026-04-05', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Bedouine', concertDate: '2026-04-09', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'ReelWorks Denver', artist: 'Kinky Circus', concertDate: '2026-04-10', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Summit Music Hall', artist: 'Hollow Crown Tour', concertDate: '2026-04-12', detail: 'Genre flagged for review: Metal', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Velvet Oblivion', concertDate: '2026-04-12', detail: 'Support: Not Specific, John Dillon & The Missing Mugshots, Oxidize', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Stomach Book', concertDate: '2026-04-13', detail: 'Support: Girls Rituals', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Red Rocks Amphitheatre', artist: 'bbno$', concertDate: '2026-04-16', detail: 'Support: Oliver Tree, Kaarija, YNG Martyr, Jungle Bobby · Genre flagged for review: Pop', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Bluebird Theater', artist: 'Rickshaw Billie\'s Burger Patrol', concertDate: '2026-04-16', detail: 'Support: Pink Fuzz, American Sharks', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Bloom', concertDate: '2026-04-17', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Nadia', concertDate: '2026-04-18', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Ginger Root', concertDate: '2026-04-19', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Clavicle', concertDate: '2026-04-23', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Late Bloomer', concertDate: '2026-04-24', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Hollie Kenniff', concertDate: '2026-04-25', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Benny The Butcher', concertDate: '2026-04-26', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'The Soft Pink Truth', concertDate: '2026-04-30', detail: 'Genre flagged for review: Electronic/EDM', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Mourn', concertDate: '2026-05-13', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Dazy', concertDate: '2026-05-14', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Softcult', concertDate: '2026-05-16', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Ohmme', concertDate: '2026-05-19', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Korgy & Bass', concertDate: '2026-05-21', detail: 'Genre flagged for review: Electronic/EDM', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Draag', concertDate: '2026-05-22', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Gus Dapperton', concertDate: '2026-05-23', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Sensamotion', concertDate: '2026-05-28', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Accessory', concertDate: '2026-06-01', detail: 'Support: Facing', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Ahjzae Dallas', concertDate: '2026-06-06', detail: 'Support: Kylie Divine, Young Rai, Sauce K', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'The Alpine Pickers', concertDate: '2026-06-11', detail: 'Support: Nowhere Dept., Graham Butler', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'MR TOUT LE MONDE', concertDate: '2026-06-13', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Red Rocks Amphitheatre', artist: 'Amyl and The Sniffers L7, PARTY DOZEN', concertDate: '2026-06-17', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Mission Ballroom', artist: 'Synthony', concertDate: '2026-06-19', detail: 'Genre flagged for review: Electronic/EDM', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Perry Maysun', concertDate: '2026-06-21', detail: 'Support: Isaiah Poet', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Gothic Theatre', artist: 'Billy Bob Thornton & The Boxmasters', concertDate: '2026-06-23', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Gothic Theatre', artist: 'Old 97s', concertDate: '2026-07-23', detail: 'Genre flagged for review: Country', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Playlunch', concertDate: '2026-08-15', detail: 'Genre flagged for review: Indie/Folk', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Mission Ballroom', artist: 'JOE RUSSO\'S ALMOST DEAD', concertDate: '2026-08-20', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Lost Lake Lounge', artist: 'Greg Mendez', concertDate: '2026-08-21', detail: 'Support: Maria BC', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Red Rocks Amphitheatre', artist: 'Levity presents LEVI-ROCKS: THE VOLCANO', concertDate: '2026-10-02', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Mission Ballroom', artist: 'Fruit Bats', concertDate: '2026-10-17', detail: '', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Red Rocks Amphitheatre', artist: 'it\'s murph', concertDate: '2026-04-04', detail: 'Support: D.O.D, oskar med k, me n ü', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Mission Ballroom', artist: 'BUNT', concertDate: '2026-07-18', detail: 'Date corrected: was listed as Jul 20, confirmed as 2026-07-18 via fresh scrape', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Mission Ballroom', artist: 'THE MARCUS KING BAND', concertDate: '2026-07-20', detail: 'Date corrected: was listed as Aug 1, confirmed as 2026-07-20 via fresh scrape', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Mission Ballroom', artist: 'DOMBRESKY & WALKER & ROYCE', concertDate: '2026-08-01', detail: 'Date corrected: was listed as Aug 11, confirmed as 2026-08-01 via fresh scrape', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Mission Ballroom', artist: 'SUGAR', concertDate: '2026-08-11', detail: 'Date corrected: was listed as Aug 20, confirmed as 2026-08-11 via fresh scrape', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Mission Ballroom', artist: 'COURTNEY BARNETT', concertDate: '2026-08-21', detail: 'Date corrected: was listed as Aug 22, confirmed as 2026-08-21 via fresh scrape', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Mission Ballroom', artist: 'SOCIAL DISTORTION', concertDate: '2026-09-22', detail: 'Date corrected: was listed as Sep 24, confirmed as 2026-09-22 via fresh scrape', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Mission Ballroom', artist: 'FOUR TET', concertDate: '2026-09-24', detail: 'Date corrected: was listed as Sep 26, confirmed as 2026-09-24 via fresh scrape', scrapeDate: '2026-03-24' },
+  { type: 'updated', venue: 'Red Rocks Amphitheatre', artist: 'bbno$', concertDate: '2026-04-16', detail: 'Name cleaned: "bbno$ w/ Oliver Tree" → "bbno$" with full support list: Oliver Tree, Kaarija, YNG Martyr, Jungle Bobby', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Ball Arena', artist: 'Demi Lovato', concertDate: '2026-05-05', detail: 'Monthly stadium scrape (2026-03-24)', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Empower Field at Mile High', artist: 'Morgan Wallen', concertDate: '2026-05-29', detail: 'Monthly stadium scrape (2026-03-24) · Night 1 of two-night run', scrapeDate: '2026-03-24' },
+  { type: 'added', venue: 'Empower Field at Mile High', artist: 'Morgan Wallen', concertDate: '2026-05-30', detail: 'Monthly stadium scrape (2026-03-24) · Night 2 of two-night run', scrapeDate: '2026-03-24' }
+];
+
+function renderChangelog() {
+  const container = document.getElementById('changelogContent');
+  const filterBar = document.getElementById('filterBar');
+
+  if (!CHANGELOG_DATA.length) return;
+
+  // Get unique venues
+  const venues = [...new Set(CHANGELOG_DATA.map(c => c.venue))].sort();
+
+  // Render filter chips
+  filterBar.innerHTML = '<span class="filter-chip active" onclick="filterVenue(\'all\')">All</span>' +
+    venues.map(v => '<span class="filter-chip" onclick="filterVenue(\'' + v.replace(/'/g, "\\'") + '\')">' + v + '</span>').join('');
+
+  renderEntries(CHANGELOG_DATA);
+}
+
+function filterVenue(venue) {
+  const chips = document.querySelectorAll('.filter-chip');
+  chips.forEach(c => c.classList.remove('active'));
+  if (venue === 'all') {
+    chips[0].classList.add('active');
+    renderEntries(CHANGELOG_DATA);
+  } else {
+    const filtered = CHANGELOG_DATA.filter(c => c.venue === venue);
+    chips.forEach(c => { if (c.textContent === venue) c.classList.add('active'); });
+    renderEntries(filtered);
+  }
+}
+
+function renderEntries(data) {
+  const container = document.getElementById('changelogContent');
+
+  // Group by venue
+  const grouped = {};
+  data.forEach(entry => {
+    if (!grouped[entry.venue]) grouped[entry.venue] = [];
+    grouped[entry.venue].push(entry);
+  });
+
+  // Sort entries within each venue by concert date
+  Object.keys(grouped).forEach(v => {
+    grouped[v].sort((a, b) => a.concertDate.localeCompare(b.concertDate));
+  });
+
+  const venuesSorted = Object.keys(grouped).sort();
+
+  if (!venuesSorted.length) {
+    container.innerHTML = '<p class="empty-state">No changes match the current filter.</p>';
+    return;
+  }
+
+  container.innerHTML = venuesSorted.map(venue => {
+    const entries = grouped[venue];
+    return '<div class="venue-section">' +
+      '<div class="venue-header"><span>' + venue + '</span><span class="count">' + entries.length + ' change' + (entries.length !== 1 ? 's' : '') + '</span></div>' +
+      entries.map(e =>
+        '<div class="change-entry">' +
+          '<span class="change-date">' + e.concertDate + '</span>' +
+          '<span class="change-type ' + e.type + '">' + e.type.toUpperCase() + '</span>' +
+          '<div class="change-detail">' +
+            '<div class="change-artist">' + e.artist + '</div>' +
+            (e.detail ? '<div class="change-meta">' + e.detail + '</div>' : '') +
+          '</div>' +
+        '</div>'
+      ).join('') +
+      '<div class="scrape-stamp">Last scraped: ' + entries[entries.length - 1].scrapeDate + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+renderChangelog();
+</script>
+</body>
+</html>
