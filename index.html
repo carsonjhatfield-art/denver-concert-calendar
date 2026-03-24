@@ -40,6 +40,20 @@
       font-size: 0.9rem;
       margin-left: 56px;
     }
+    .changelog-link {
+      margin-left: 56px;
+      margin-top: 8px;
+    }
+    .changelog-link a {
+      color: #7c4dff;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .changelog-link a:hover {
+      color: #e040fb;
+      text-decoration: underline;
+    }
 
     /* FILTERS */
     .filters-bar {
@@ -382,6 +396,26 @@
     }
     .ticket-btn:hover { opacity: 0.88; transform: translateY(-1px); }
     .ticket-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .spotify-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 7px 16px;
+      background: #1db954;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.03em;
+    }
+    .spotify-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .spotify-btn svg { width: 14px; height: 14px; fill: currentColor; }
+    .modal-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
     .meta-tag {
       font-size: 0.72rem;
       background: rgba(255,255,255,0.07);
@@ -400,10 +434,14 @@
     .empty-month .emoji { font-size: 2.5rem; display: block; margin-bottom: 12px; }
 
     @media (max-width: 700px) {
-      header { padding: 18px 16px 14px; }
+      header { padding: 18px 16px 14px; position: sticky; top: 0; z-index: 100; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
       h1 { font-size: 1.4rem; }
       .subtitle { margin-left: 0; margin-top: 6px; }
+      .changelog-link { margin-left: 0; }
       .filters-bar { padding: 10px 16px; }
+      .month-nav { position: sticky; z-index: 99; background: #0f0f14; }
+      .month-dots { position: sticky; z-index: 98; background: #0f0f14; }
+      .legend-wrap { position: sticky; z-index: 97; background: #0f0f14; }
       .calendar-wrap, .legend-wrap { padding-left: 8px; padding-right: 8px; }
       .cal-cell { padding: 5px; }
       .cal-grid { grid-auto-rows: 120px; }
@@ -421,6 +459,7 @@
     <h1>Denver Concerts 2026</h1>
   </div>
   <div class="subtitle">Live music across Denver's greatest venues &mdash; Red Rocks, Ball Arena, Mission Ballroom &amp; more</div>
+  <div class="changelog-link"><a href="changelog.html">New shows as of Mar 24, 2026 &rarr;</a></div>
   <div class="search-wrap" style="margin-top:14px;">
     <span class="search-icon">&#128269;</span>
     <input type="text" class="search-input" id="artistSearch" placeholder="Search by artist name..." autocomplete="off">
@@ -542,8 +581,8 @@ const CONCERTS = [
   { date: '2026-04-04', name: 'Night Mullet', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: '' },
   { date: '2026-04-04', name: 'Mindchatter', venue: 'Mission Ballroom', genre: 'Electronic/EDM', support: 'Aka Vinnie', ticketUrl: 'https://www.axs.com/events/1206219/mindchatter-tickets' },
   { date: '2026-04-04', name: 'Jaenga', venue: 'Ogden Theatre', genre: 'Electronic/EDM', support: 'Josh Teed, Pretty Sweet, Auracle, Wesley Mack', ticketUrl: 'https://www.axs.com/events/1213691/jaenga-tickets' },
-  { date: '2026-04-04', name: 'Currents & ERRA', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/currents-erra-the-silence-follows-tour-denver-colorado-04-04-2026/event/1E006367DAD59012' },,
-  { date: '2026-04-04', name: 'it\'s murph', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'D.O.D, oskar med k, me n ü', ticketUrl: '' }
+  { date: '2026-04-04', name: 'Currents & ERRA', venue: 'Summit Music Hall', genre: 'Rock', support: '', ticketUrl: 'https://www.ticketmaster.com/currents-erra-the-silence-follows-tour-denver-colorado-04-04-2026/event/1E006367DAD59012' },
+  { date: '2026-04-04', name: 'it\'s murph', venue: 'Red Rocks Amphitheatre', genre: 'Electronic/EDM', support: 'D.O.D, oskar med k, me n ü', ticketUrl: '' },
   { date: '2026-04-05', name: 'Koffin Kats', venue: 'Bluebird Theater', genre: 'Rock', support: 'Carrie Nation and the Speakeasy', ticketUrl: 'https://www.axs.com/events/1300361/koffin-kats-tickets' },
   { date: '2026-04-05', name: 'Marissa Nadler', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: 'Anand Wilder', ticketUrl: 'https://www.etix.com/ticket/p/56911752/marissa-nadler-wanand-wilder-of-yeasayer-denver-lost-lake-lounge' },
   { date: '2026-04-05', name: 'Soft Fangs', venue: 'Lost Lake Lounge', genre: 'Indie/Folk', support: '', ticketUrl: '' },
@@ -1209,13 +1248,17 @@ function openModal(dateStr) {
       ? '<a class="ticket-btn" href="' + ev.ticketUrl + '" target="_blank" rel="noopener">' +
         '<svg viewBox="0 0 24 24"><path d="M22 10V6a2 2 0 00-2-2H4a2 2 0 00-2 2v4a2 2 0 010 4v4a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 010-4zm-2-1.46a4 4 0 000 6.92V18H4v-2.54a4 4 0 000-6.92V6h16v2.54z"/></svg>' +
         'Buy Tickets</a>' : '';
+    var spotifyHtml = '<a class="spotify-btn" href="https://open.spotify.com/search/' + encodeURIComponent(ev.name) + '" target="_blank" rel="noopener">' +
+      '<svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>' +
+      'Spotify</a>';
+    var btnRow = (ticketHtml || spotifyHtml) ? '<div class="modal-btn-row">' + ticketHtml + spotifyHtml + '</div>' : '';
     body += '<div class="modal-event ' + cls + '">' +
       '<div class="modal-event-name">' + ev.name + '</div>' +
       '<div class="modal-event-meta">' +
       '<span class="meta-tag">&#128205; ' + ev.venue + '</span>' +
       '<span class="meta-tag">&#127926; ' + ev.genre + '</span>' +
       (ev.support ? '<span class="meta-tag">w/ ' + ev.support + '</span>' : '') +
-      '</div>' + ticketHtml + '</div>';
+      '</div>' + btnRow + '</div>';
   });
   document.getElementById('modalBody').innerHTML = body;
   document.getElementById('modalOverlay').classList.add('open');
@@ -1346,10 +1389,28 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowRight')  nextMonth();
 });
 
+// ── STICKY OFFSETS (mobile) ─────────────────────
+function updateStickyOffsets() {
+  if (window.innerWidth > 700) return;
+  var header = document.querySelector('header');
+  var monthNav = document.querySelector('.month-nav');
+  var monthDots = document.querySelector('.month-dots');
+  var legendWrap = document.querySelector('.legend-wrap');
+  var top = header.offsetHeight;
+  monthNav.style.top = top + 'px';
+  top += monthNav.offsetHeight;
+  monthDots.style.top = top + 'px';
+  top += monthDots.offsetHeight;
+  legendWrap.style.top = top + 'px';
+}
+window.addEventListener('resize', updateStickyOffsets);
+window.addEventListener('load', updateStickyOffsets);
+
 // ── INIT ───────────────────────────────────────
 renderFilterChips();
 renderLegend();
 applyFilters();
+updateStickyOffsets();
 </script>
 </body>
 </html>
