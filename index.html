@@ -262,6 +262,14 @@
       margin-bottom: 5px;
       font-weight: 600;
     }
+    .day-label {
+      display: none; /* hidden on desktop — shown on mobile */
+      font-size: 0.68rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
     .event-chip {
       font-size: 0.68rem;
       padding: 3px 6px;
@@ -1281,11 +1289,13 @@ function renderCalendar() {
       chips += '<div class="more-events">see ' + (dayEvents.length - maxVisible) + ' more</div>';
     }
 
+    var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var dowLabel = dayNames[new Date(year, month, day).getDay()];
     html += '<div class="cal-cell' +
       (hasEvents ? ' has-events' : '') +
       (isToday   ? ' today'     : '') + '"' +
       (hasEvents ? ' onclick="openModal(\'' + dateStr + '\')"' : '') + '>' +
-      '<div class="day-num">' + day + '</div>' +
+      '<div class="day-num"><span class="day-label">' + dowLabel + '</span>' + day + '</div>' +
       chips +
       '</div>';
   }
