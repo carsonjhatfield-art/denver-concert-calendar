@@ -446,15 +446,28 @@
     .picks-signin {
       margin-left: auto;
       font-size: 0.78rem;
-      color: #666;
+      color: #ccc;
       cursor: pointer;
-      transition: color 0.15s;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      background: #1e1e2e;
+      border: 1px solid #3a3a5a;
+      border-radius: 20px;
+      padding: 6px 16px 6px 10px;
     }
-    .picks-signin:hover { color: #e040fb; }
-    .picks-signin.signed-in { color: #69f0ae; cursor: default; }
+    .picks-signin:hover { border-color: #7c4dff; background: #252538; }
+    .picks-signin .google-logo {
+      width: 16px; height: 16px; flex-shrink: 0;
+    }
+    .picks-signin.signed-in {
+      color: #69f0ae;
+      cursor: default;
+      border-color: rgba(105,240,174,0.3);
+      background: rgba(105,240,174,0.06);
+    }
+    .picks-signin.signed-in:hover { border-color: rgba(105,240,174,0.3); background: rgba(105,240,174,0.06); }
     .picks-status {
       font-size: 0.72rem;
       color: #555;
@@ -463,20 +476,36 @@
 
     /* HEART TOGGLE IN MODAL */
     .pick-heart {
-      background: none;
-      border: none;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid #3a3a5a;
+      border-radius: 20px;
       cursor: pointer;
-      font-size: 1.3rem;
-      padding: 2px 6px;
-      transition: transform 0.15s;
+      font-size: 0.82rem;
+      padding: 6px 14px;
+      transition: all 0.2s;
       line-height: 1;
       float: right;
+      color: #888;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: inherit;
     }
-    .pick-heart:hover { transform: scale(1.2); }
-    .pick-heart.picked { animation: heartPop 0.3s ease; }
+    .pick-heart:hover {
+      border-color: #e040fb;
+      background: rgba(224,64,251,0.08);
+      color: #e040fb;
+    }
+    .pick-heart.picked {
+      background: rgba(224,64,251,0.15);
+      border-color: #e040fb;
+      color: #e040fb;
+      animation: heartPop 0.3s ease;
+    }
+    .pick-heart .heart-icon { font-size: 1.1rem; line-height: 1; }
     @keyframes heartPop {
       0% { transform: scale(1); }
-      50% { transform: scale(1.35); }
+      50% { transform: scale(1.08); }
       100% { transform: scale(1); }
     }
 
@@ -600,14 +629,15 @@
 
 <!-- Picks Toolbar -->
 <div class="picks-bar" id="picksBar">
-  <span class="picks-count" id="picksCount"><span>0</span> picks</span>
+  <span class="picks-count" id="picksCount"><span>0</span> concerts</span>
   <button class="picks-toggle-btn" id="picksToggle" onclick="togglePicksFilter()">
-    &#9829; Show My Picks
+    &#9829; Show only my concerts
   </button>
   <button class="picks-share-btn" id="picksShareBtn" onclick="openShareModal()">
     &#128279; Share List
   </button>
   <div class="picks-signin" id="picksSignin" onclick="handleSignIn()">
+    <svg class="google-logo" id="googleLogo" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.03 24.03 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
     <span id="signinLabel">Sign in to save across devices</span>
   </div>
   <span class="picks-status" id="picksStatus"></span>
@@ -651,8 +681,8 @@
 <!-- Share Modal -->
 <div class="share-overlay" id="shareOverlay" onclick="closeShareOutside(event)">
   <div class="share-modal">
-    <h3>Share Your Picks</h3>
-    <p style="color:#888;font-size:0.85rem;">Anyone with this link can see your saved picks</p>
+    <h3>Share Your Concerts</h3>
+    <p style="color:#888;font-size:0.85rem;">Anyone with this link can see your saved concerts</p>
     <div class="share-url-box">
       <input type="text" class="share-url-input" id="shareUrlInput" readonly>
       <button class="share-copy-btn" id="shareCopyBtn" onclick="copyShareUrl()">Copy</button>
@@ -1434,8 +1464,9 @@ function openModal(dateStr) {
     var isPicked = myPicks.has(ev.id);
     var heartHtml = '<button class="pick-heart' + (isPicked ? ' picked' : '') +
       '" onclick="event.stopPropagation(); togglePick(\'' + ev.id + '\')" title="' +
-      (isPicked ? 'Remove from picks' : 'Add to picks') + '">' +
-      (isPicked ? '&#10084;&#65039;' : '&#9825;') + '</button>';
+      (isPicked ? 'Remove from my concerts' : 'Add to my concerts') + '">' +
+      '<span class="heart-icon">' + (isPicked ? '&#10084;&#65039;' : '&#9825;') + '</span> ' +
+      (isPicked ? 'Saved' : 'Save') + '</button>';
     var ticketHtml = ev.ticketUrl
       ? '<a class="ticket-btn" href="' + ev.ticketUrl + '" target="_blank" rel="noopener">' +
         '<svg viewBox="0 0 24 24"><path d="M22 10V6a2 2 0 00-2-2H4a2 2 0 00-2 2v4a2 2 0 010 4v4a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 010-4zm-2-1.46a4 4 0 000 6.92V18H4v-2.54a4 4 0 000-6.92V6h16v2.54z"/></svg>' +
@@ -1653,17 +1684,17 @@ function findOpenModalDate() {
 function updatePicksUI() {
   var count = myPicks.size;
   document.getElementById('picksCount').innerHTML =
-    '<span>' + count + '</span> pick' + (count !== 1 ? 's' : '');
+    '<span>' + count + '</span> concert' + (count !== 1 ? 's' : '');
   var shareBtn = document.getElementById('picksShareBtn');
   if (count > 0) shareBtn.classList.add('visible');
   else shareBtn.classList.remove('visible');
   var toggleBtn = document.getElementById('picksToggle');
   if (showOnlyPicks) {
     toggleBtn.classList.add('active');
-    toggleBtn.innerHTML = '&#9829; Showing Picks';
+    toggleBtn.innerHTML = '&#9829; Showing my concerts';
   } else {
     toggleBtn.classList.remove('active');
-    toggleBtn.innerHTML = '&#9829; Show My Picks';
+    toggleBtn.innerHTML = '&#9829; Show only my concerts';
   }
   if (picksLoaded) renderCalendar();
 }
@@ -1839,14 +1870,17 @@ function loadExistingUserList(uid) {
 function updateSignInUI(user) {
   var el = document.getElementById('picksSignin');
   var label = document.getElementById('signinLabel');
+  var logo = document.getElementById('googleLogo');
   if (user && !user.isAnonymous) {
     el.classList.add('signed-in');
     label.textContent = user.displayName || user.email || 'Signed in';
     el.onclick = null;
+    if (logo) logo.style.display = 'none';
   } else {
     el.classList.remove('signed-in');
     label.textContent = 'Sign in to save across devices';
     el.onclick = handleSignIn;
+    if (logo) logo.style.display = '';
   }
 }
 
