@@ -1288,8 +1288,8 @@ const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
 
 // State
-let currentMonth = 2; // March = index 2 (0-based)
-let currentYear  = 2026;
+let currentMonth = new Date().getMonth(); // 0-based, auto from today's date
+let currentYear  = new Date().getFullYear();
 let filteredConcerts = [...CONCERTS];
 
 const ALL_VENUES = [...new Set(CONCERTS.map(c => c.venue))].sort();
@@ -1875,7 +1875,7 @@ function updateSignInUI(user) {
     el.classList.add('signed-in');
     label.textContent = user.displayName || user.email || 'Signed in';
     el.onclick = null;
-    if (logo) logo.style.display = 'none';
+    if (logo) logo.style.display = '';
   } else {
     el.classList.remove('signed-in');
     label.textContent = 'Sign in to save across devices';
