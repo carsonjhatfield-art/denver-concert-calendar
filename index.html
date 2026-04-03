@@ -248,6 +248,14 @@
       margin-bottom: 5px;
       font-weight: 600;
     }
+    .day-label {
+      display: none;
+      font-size: 0.68rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
     .event-chip {
       font-size: 0.68rem;
       padding: 3px 6px;
@@ -592,19 +600,111 @@
     }
     .share-close-btn:hover { color: #fff; }
 
+    /* ── TABLET / SMALL SCREEN (2-column grid) ── */
     @media (max-width: 700px) {
-      header { padding: 18px 16px 14px; }
+      /* Sticky: header, month nav, month dots, genre legend */
+      header {
+        padding: 18px 16px 14px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      }
       h1 { font-size: 1.4rem; }
       .subtitle { margin-left: 0; margin-top: 6px; }
+      /* Filters/search scroll away — NOT sticky */
       .filters-bar { padding: 10px 16px; }
       .picks-bar { padding: 10px 16px; }
+      .month-nav {
+        position: sticky;
+        z-index: 99;
+        background: #0f0f14;
+        padding-top: 12px;
+        padding-bottom: 6px;
+      }
+      .month-dots {
+        position: sticky;
+        z-index: 98;
+        background: #0f0f14;
+        padding-bottom: 10px;
+      }
+      .legend-wrap {
+        position: sticky;
+        z-index: 97;
+        background: #0f0f14;
+        padding-top: 4px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #2a2a4a;
+      }
       .calendar-wrap, .legend-wrap { padding-left: 8px; padding-right: 8px; }
-      .cal-cell { padding: 5px; }
-      .cal-grid { grid-auto-rows: 120px; }
-      .event-chip { font-size: 0.6rem; }
       select { min-width: 130px; font-size: 0.82rem; }
       .result-count { margin-left: 0; }
       .picks-signin { margin-left: 0; }
+
+      /* Hide 7-column day-of-week header row */
+      .cal-header-row { display: none; }
+
+      /* 2-column grid with auto-height rows */
+      .cal-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: auto;
+        gap: 8px;
+      }
+
+      /* Hide empty leading/trailing cells */
+      .cal-cell.empty { display: none; }
+
+      /* Larger, more readable day tiles */
+      .cal-cell {
+        padding: 10px 12px;
+        min-height: 100px;
+        border-radius: 12px;
+      }
+      .day-num {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        color: #888;
+      }
+      /* Event chips wrap text instead of truncating */
+      .event-chip {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        line-height: 1.35;
+      }
+      .more-events {
+        font-size: 0.72rem;
+        padding-top: 2px;
+      }
+      /* Show inline day-of-week label (e.g. "Mon") on mobile */
+      .day-label { display: inline; margin-right: 6px; }
+    }
+
+    /* ── NARROW PHONE (single-column list) ── */
+    @media (max-width: 480px) {
+      .cal-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .cal-cell {
+        padding: 12px 14px;
+        min-height: auto;
+      }
+      .day-num {
+        font-size: 1rem;
+        font-weight: 700;
+      }
+      .event-chip {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        margin-bottom: 5px;
+      }
+      .month-label { font-size: 1.15rem; min-width: 180px; }
+      .legend { gap: 6px; }
+      .legend-item { font-size: 0.68rem; padding: 2px 6px 2px 4px; }
     }
   </style>
 </head>
@@ -1455,11 +1555,13 @@ function renderCalendar() {
       chips += '<div class="more-events">see ' + (dayEvents.length - maxVisible) + ' more</div>';
     }
 
+    var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var dowLabel = dayNames[new Date(currentYear, currentMonth, day).getDay()];
     html += '<div class="cal-cell' +
       (hasEvents ? ' has-events' : '') +
       (isToday   ? ' today'     : '') + '"' +
       (hasEvents ? ' onclick="openModal(\'' + dateStr + '\')"' : '') + '>' +
-      '<div class="day-num">' + day + '</div>' +
+      '<div class="day-num"><span class="day-label">' + dowLabel + '</span>' + day + '</div>' +
       chips +
       '</div>';
   }
@@ -2010,11 +2112,29 @@ auth.onAuthStateChanged(function(user) {
   if (user) updateSignInUI(user);
 });
 
+// ── STICKY HEADER OFFSETS (mobile only) ────────
+function updateStickyOffsets() {
+  if (window.innerWidth > 700) return;
+  var header = document.querySelector('header');
+  var monthNav = document.querySelector('.month-nav');
+  var monthDots = document.querySelector('.month-dots');
+  var legendWrap = document.querySelector('.legend-wrap');
+  var top = header.offsetHeight;
+  monthNav.style.top = top + 'px';
+  top += monthNav.offsetHeight;
+  monthDots.style.top = top + 'px';
+  top += monthDots.offsetHeight;
+  legendWrap.style.top = top + 'px';
+}
+window.addEventListener('resize', updateStickyOffsets);
+window.addEventListener('load', updateStickyOffsets);
+
 // ── INIT ───────────────────────────────────────
 renderFilterChips();
 renderLegend();
 applyFilters();
 initPicks();
+updateStickyOffsets();
 </script>
 </body>
 </html>
