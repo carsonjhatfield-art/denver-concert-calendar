@@ -409,6 +409,14 @@
       gap: 14px;
       flex-wrap: wrap;
     }
+    .shared-list-banner {
+      font-size: 0.85rem;
+      color: #e040fb;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-right: 1px solid #2a2a4a;
+      margin-right: 4px;
+    }
     .picks-count {
       font-size: 0.82rem;
       color: #aaa;
@@ -629,6 +637,7 @@
 
 <!-- Picks Toolbar -->
 <div class="picks-bar" id="picksBar">
+  <span class="shared-list-banner" id="sharedListBanner" style="display:none;"></span>
   <span class="picks-count" id="picksCount"><span>0</span> concerts</span>
   <button class="picks-toggle-btn" id="picksToggle" onclick="togglePicksFilter()">
     &#9829; Show only my concerts
@@ -1654,6 +1663,7 @@ let showOnlyPicks = false;
 let picksDocId = null;
 let picksLoaded = false;
 let isSaving = false;
+let listOwnerName = null;  // set when viewing someone else's shared list
 
 function initPicks() {
   const params = new URLSearchParams(window.location.search);
@@ -1679,8 +1689,18 @@ function loadPicksFromFirestore(docId) {
   db.collection('lists').doc(docId).get()
     .then(function(doc) {
       if (doc.exists) {
-        myPicks = new Set(doc.data().picks || []);
+        var data = doc.data();
+        myPicks = new Set(data.picks || []);
         picksDocId = docId;
+        // Check if this is someone else's shared list
+        var currentUid = auth.currentUser ? auth.currentUser.uid : null;
+        if (data.ownerId && data.ownerId !== currentUid) {
+          listOwnerName = data.ownerName || 'Someone';
+        }
+        // Backfill ownerName if owner loads their own list and it's missing
+        if (data.ownerId && data.ownerId === currentUid && !data.ownerName && auth.currentUser.displayName) {
+          db.collection('lists').doc(docId).update({ ownerName: auth.currentUser.displayName });
+        }
         savePicksToLocal();
         setPicksStatus('');
       } else {
@@ -1724,16 +1744,25 @@ function updatePicksUI() {
   var count = myPicks.size;
   document.getElementById('picksCount').innerHTML =
     '<span>' + count + '</span> concert' + (count !== 1 ? 's' : '');
+  // Show/hide shared list banner
+  var banner = document.getElementById('sharedListBanner');
+  if (listOwnerName) {
+    banner.textContent = listOwnerName + '\'s Concert List';
+    banner.style.display = '';
+  } else {
+    banner.style.display = 'none';
+  }
   var shareBtn = document.getElementById('picksShareBtn');
   if (count > 0) shareBtn.classList.add('visible');
   else shareBtn.classList.remove('visible');
   var toggleBtn = document.getElementById('picksToggle');
+  var whose = listOwnerName ? listOwnerName + '\'s' : 'my';
   if (showOnlyPicks) {
     toggleBtn.classList.add('active');
-    toggleBtn.innerHTML = '&#9829; Showing my concerts';
+    toggleBtn.innerHTML = '&#9829; Showing ' + whose + ' concerts';
   } else {
     toggleBtn.classList.remove('active');
-    toggleBtn.innerHTML = '&#9829; Show only my concerts';
+    toggleBtn.innerHTML = '&#9829; Show only ' + whose + ' concerts';
   }
   if (picksLoaded) renderCalendar();
 }
@@ -1773,15 +1802,19 @@ function savePicksToFirestore() {
     : auth.signInAnonymously().then(function(cred) { return cred.user; });
   authPromise.then(function(user) {
     if (picksDocId) {
-      return db.collection('lists').doc(picksDocId).update({
+      var updateData = {
         picks: picksArray,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function() { return picksDocId; });
+      };
+      if (user.displayName) updateData.ownerName = user.displayName;
+      return db.collection('lists').doc(picksDocId).update(updateData)
+        .then(function() { return picksDocId; });
     } else {
       var newId = generateListCode();
       return db.collection('lists').doc(newId).set({
         picks: picksArray,
         ownerId: user.uid,
+        ownerName: user.displayName || 'Someone',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(function() {
@@ -1853,8 +1886,14 @@ function handleSignIn() {
       .then(function(result) {
         updateSignInUI(result.user);
         setPicksStatus('Account linked!');
-        if (picksDocId) {
-          db.collection('lists').doc(picksDocId).update({ ownerId: result.user.uid });
+        if (listOwnerName) {
+          // Viewing someone else's shared list — create the user's own copy
+          createOwnListFromShared(result.user);
+        } else if (picksDocId) {
+          db.collection('lists').doc(picksDocId).update({
+            ownerId: result.user.uid,
+            ownerName: result.user.displayName || 'Someone'
+          });
         }
         setTimeout(function() { setPicksStatus(''); }, 2000);
       })
@@ -1871,7 +1910,11 @@ function handleSignIn() {
     auth.signInWithPopup(provider)
       .then(function(result) {
         updateSignInUI(result.user);
-        loadExistingUserList(result.user.uid);
+        if (listOwnerName) {
+          createOwnListFromShared(result.user);
+        } else {
+          loadExistingUserList(result.user.uid);
+        }
       })
       .catch(function(err) {
         console.error('Sign-in error:', err);
@@ -1885,7 +1928,11 @@ function handleMerge(credential) {
   auth.signInWithCredential(credential)
     .then(function(result) {
       updateSignInUI(result.user);
-      loadExistingUserList(result.user.uid);
+      if (listOwnerName) {
+        createOwnListFromShared(result.user);
+      } else {
+        loadExistingUserList(result.user.uid);
+      }
     })
     .catch(function(err) { console.error('Merge error:', err); });
 }
@@ -1903,6 +1950,42 @@ function loadExistingUserList(uid) {
         updatePicksUI();
         debounceSaveToFirestore();
       }
+    });
+}
+
+function createOwnListFromShared(user) {
+  // Check if this user already has their own list
+  db.collection('lists').where('ownerId', '==', user.uid).limit(1).get()
+    .then(function(snapshot) {
+      if (!snapshot.empty) {
+        // Merge shared picks into their existing list
+        var doc = snapshot.docs[0];
+        var existingPicks = new Set(doc.data().picks || []);
+        myPicks.forEach(function(id) { existingPicks.add(id); });
+        myPicks = existingPicks;
+        picksDocId = doc.id;
+      } else {
+        // Create a brand new list with the shared picks
+        var newId = generateListCode();
+        picksDocId = newId;
+        db.collection('lists').doc(newId).set({
+          picks: [...myPicks],
+          ownerId: user.uid,
+          ownerName: user.displayName || 'Someone',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      // Clear shared list state — this is now the user's own list
+      listOwnerName = null;
+      // Update URL to remove the shared ?list= parameter
+      var cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+      savePicksToLocal();
+      updatePicksUI();
+      debounceSaveToFirestore();
+      setPicksStatus('Saved to your list!');
+      setTimeout(function() { setPicksStatus(''); }, 2000);
     });
 }
 
